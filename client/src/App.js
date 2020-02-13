@@ -1,25 +1,41 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
+
+import { ConnectedRouter as Router } from 'connected-react-router';
+import styled from 'styled-components';
+import { history } from './store/configureStore';
+import SignIn from './components/SignIn';
+import Room from './components/Room';
+
+const Styled = {
+  Container: styled.div`
+    width: 100vw;
+    height: 100vh;
+    background-color: #2c3e50;
+  `
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Styled.Container>
+      <Router history={history}>
+        <Switch>
+          <Route exact path="/">
+            <SignIn />
+          </Route>
+          <Route exact path="/room">
+            <Redirect to="/" />
+          </Route>
+          <Route path="/room/:id">
+            <Room />
+          </Route>
+        </Switch>
+      </Router>
+    </Styled.Container>
   );
 }
 
