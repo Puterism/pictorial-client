@@ -12,6 +12,7 @@ const port = process.env.PORT || 3001;
 
 const app = express();
 const server = http.createServer(app);
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(express.json());
@@ -30,7 +31,9 @@ const sessionMiddleware = session({
 });
 
 const indexRouter = require('./routes/index');
+const imageRouter = require('./routes/images');
 app.use('/', indexRouter);
+app.use('/images', imageRouter);  
 app.use(cors);
 
 server.listen(port, () => console.log(`Server has started on port ${port}`));
