@@ -1,17 +1,36 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useCallback } from 'react';
-import { fetchRoomID } from '../modules/room'
+import { fetchRoomCode, connectRoom, setName, setCode } from '../modules/room'
 
 export default function useRoom() {
-  const id = useSelector((state) => state.room.id);
+  const name = useSelector((state) => state.room.name);
+  const code = useSelector((state) => state.room.code);
   const dispatch = useDispatch();
 
   const onFetchRoomID = useCallback(
-    (nickname) => dispatch(fetchRoomID(nickname)),
-    [dispatch]);
+    (name) => dispatch(fetchRoomCode(name)),
+    [dispatch]
+  );
+  
+  const onConnectRoom = useCallback(
+    (name, code) => dispatch(connectRoom(name, code)),
+    [dispatch]
+  );
+
+  const onSetName = useCallback(
+    (name) => dispatch(setName(name)),
+    [dispatch]
+  );
+
+  const onSetCode = useCallback(
+    (code) => dispatch(setCode(code)),
+    [dispatch]
+  );
 
   return {
-    id,
+    name, code,
     onFetchRoomID,
+    onConnectRoom,
+    onSetName, onSetCode,
   };
 }

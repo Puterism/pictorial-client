@@ -3,7 +3,9 @@ import {
   Switch,
   Route,
   Redirect,
+  useParams,
 } from 'react-router-dom';
+import useRoom from './hooks/useRoom';
 
 import { ConnectedRouter as Router } from 'connected-react-router';
 import styled, { createGlobalStyle } from 'styled-components';
@@ -39,6 +41,8 @@ const Styled = {
 }
 
 function App() {
+  const { name } = useRoom();
+
   return (
     <Styled.Container bg={bg}>
       <Styled.GlobalStyle />
@@ -47,10 +51,13 @@ function App() {
           <Route exact path="/">
             <Join />
           </Route>
+          <Route exact path="/:code">
+            <Join />
+          </Route>
           <Route exact path="/room">
             <Redirect to="/" />
           </Route>
-          <Route path="/room/:id">
+          <Route path="/room/:code">
             <Room />
           </Route>
         </Switch>

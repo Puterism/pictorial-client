@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useParams } from 'react-router-dom';
 
 import Planet from '../svgs/Planet.svg';
 import { ReactComponent as Logo } from '../svgs/Pictorial.svg';
+import useRoom from '../hooks/useRoom';
 
 const Styled = {
   Container: styled.div`
@@ -69,6 +71,8 @@ const Styled = {
 
 function Join() {
   const [name, setName] = useState('');
+  const { onFetchRoomID, onConnectRoom, onSetCode } = useRoom();
+  const { code } = useParams();
 
   const handleChangeInput = e => {
     setName(e.target.value);
@@ -76,8 +80,16 @@ function Join() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    // TODO: Submit
+    if (code) {
+      onConnectRoom(name, code);
+    } else {
+      onFetchRoomID(name);
+    }
   }
+
+  useEffect(() => {
+    if (code) onSetCode(code);
+  }, [onSetCode, code])
 
   return (
     <Styled.Container>
@@ -89,7 +101,9 @@ function Join() {
             onChange={handleChangeInput}
             placeholder="내 닉네임 입력"
           />
-          <Styled.JoinButton>참가하기</Styled.JoinButton>
+          <Styled.JoinButton>
+            { code ? "참가하기" : "방만들기" }
+          </Styled.JoinButton>
         </Styled.Form>
       </Styled.Planet>
     </Styled.Container>

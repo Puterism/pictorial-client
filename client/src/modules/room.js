@@ -7,6 +7,9 @@ export const CONNECT_ROOM = 'room/CONNECT_ROOM';
 export const CONNECT_ROOM_SUCCESS = 'room/CONNECT_ROOM_SUCCESS';
 export const CONNECT_ROOM_FAILURE = 'room/CONNECT_ROOM_FAILURE';
 
+export const SET_NAME = 'room/SET_NAME';
+export const SET_CODE = 'room/SET_CODE';
+
 
 // action
 export const fetchRoomCode = (name) => ({
@@ -43,6 +46,16 @@ export const connectRoomFailure = (response) => ({
   type: CONNECT_ROOM_FAILURE,
   payload: response,
 });
+
+export const setName = (name) => ({
+  type: SET_NAME,
+  payload: name,
+})
+
+export const setCode = (code) => ({
+  type: SET_CODE,
+  payload: code,
+})
 
 const initialState = {
   code: '',
@@ -81,17 +94,28 @@ function room(state = initialState, { type, payload }) {
     case CONNECT_ROOM_SUCCESS:
       return {
         ...state,
-        ...payload.data,
+        ...payload,
         connected: true,
       };
 
     case CONNECT_ROOM_FAILURE:
       return {
         ...state,
-        ...payload.response.data,
         connected: false,
         showError: true,
       };
+
+    case SET_NAME:
+      return {
+        ...state,
+        name: payload.name,
+      }
+    
+    case SET_CODE:
+      return {
+        ...state,
+        code: payload.code,
+      }
 
     default:
       return state;
