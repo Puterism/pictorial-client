@@ -1,16 +1,18 @@
 const socketio = require('socket.io');
 const db = require('./db');
 
-module.exports = (server, app) => {
+module.exports = (server, app, sessionMiddleware) => {
     const io = socketio(server);
 
     app.set('io', io);
     const room = io.of('/room');
+    io.use((socket, next) => {
+        sessionMiddleware(socket.request, socket.request.res, next);
+    });
 
     room.on('connect', (socket) => {
         console.log('socket.io room connected!');
-
-        let roomCode, userName;
+        const req = socket.request;
 
         socket.on('join', (name, code) => {
             console.log('room join!');
@@ -19,17 +21,15 @@ module.exports = (server, app) => {
             socket.broadcast.to(code).emit('message', { text: `${name}, has joined!`});
 
             socket.join(code);
-            roomCode = code;
-            userName = name;
+
+            req.session.userName = name;
+            req.session.roomCode = code;
+            console.log(req.session.userName, req.session.roomCode);
         });
 
         socket.on('disconnect', () => {
             console.log('room disconnected!');
-            if(roomCode) {
-                // DB 처리
-                db.deleteUser(userName, roomCode);
-                const result = db.getUsersInRoom(roomCode);
-            }
+            // DB 처리
         }); 
     });
 }
