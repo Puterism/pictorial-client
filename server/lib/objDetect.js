@@ -11,7 +11,7 @@ var request = require('request');
 
 /* variables */
 var client_id = 'gm1eyl4dop';
-var client_secret = 'xoGfDqVhO0Tshj8dOtp03XQzphHntX3cW8vG7V1f';
+var client_secret = process.env.API_KEY;
 var api_url = 'https://naveropenapi.apigw.ntruss.com/vision-obj/v1/detect'; // 객체 인식 NCP api
 var parentPath = path.normalize(__dirname+"/..");
 var imagePath = path.normalize(parentPath + "/public/images")
