@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const nanoid = require('nanoid');
 const db = require('../lib/db');
+const app = express();
 
 router.post('/create', async (req, res) => {
     try {
