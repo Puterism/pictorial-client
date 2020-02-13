@@ -1,0 +1,99 @@
+import React, { useState } from 'react';
+import styled from 'styled-components';
+
+import Planet from '../svgs/Planet.svg';
+import { ReactComponent as Logo } from '../svgs/Pictorial.svg';
+
+const Styled = {
+  Container: styled.div`
+    width: 100%;
+    height: 100%;
+  `,
+  
+  Planet: styled.div`
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-image: url(${Planet});
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  `,
+
+  Form: styled.form`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  `,
+
+  Input: styled.input`
+    width: 340px;
+    height: 55px;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    background-color: #ffffff;
+    border: none;
+    text-align: center;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 1.5em;
+    margin-top: 93px;
+    letter-spacing: 2.8px;
+
+    &::placeholder {
+      text-align: center;
+    }
+  `,
+
+  JoinButton: styled.button`
+    width: 200px;
+    height: 65px;
+    border-radius: 15px;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    background-image: linear-gradient(to top, #210081, #0042a6);
+    border: none;
+    letter-spacing: 6.72px;
+    color: white;
+    font-size: 1.5em;
+    font-family: inherit;
+    font-weight: 800;
+    margin-top: 29px;
+    cursor: pointer;
+  `,
+}
+
+function Join() {
+  const [name, setName] = useState('');
+
+  const handleChangeInput = e => {
+    setName(e.target.value);
+  }
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    // TODO: Submit
+  }
+
+  return (
+    <Styled.Container>
+      <Styled.Planet>
+        <Styled.Form onSubmit={handleSubmit}>
+          <Logo />
+          <Styled.Input
+            value={name}
+            onChange={handleChangeInput}
+            placeholder="내 닉네임 입력"
+          />
+          <Styled.JoinButton>참가하기</Styled.JoinButton>
+        </Styled.Form>
+      </Styled.Planet>
+    </Styled.Container>
+  )
+}
+
+export default Join;
