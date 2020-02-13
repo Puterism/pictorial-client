@@ -49,6 +49,10 @@ router.get('/', (req, res, next)=>{
 
 /* 이미지 업로드 처리 */
 router.post('/upload', 
+    (req, res, next)=>{
+      console.log(req.body);
+      next();
+    }, 
     upload.single('IMG_FILE'),  // post 방식으로 전달된 이미지 해석
     img2base64,                 // img를 base64로 변환하고 req.body.encoded에 저장
     objDetect,                  // img를 ncp object detect 서버에 보내고 결과를 돌려받아 req.body.objDetect_... 에 저장
