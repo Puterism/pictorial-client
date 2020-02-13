@@ -12,8 +12,12 @@ db.Sequelize = Sequelize;
 
 db.Room = require('./room')(sequelize, Sequelize);
 db.User = require('./user')(sequelize, Sequelize);
+db.ImageInfo = require('./imageInfo')(sequelize, Sequelize);
+db.GameData = require('./gameData')(sequelize, Sequelize);
 
 db.Room.hasMany(db.User);
 db.User.belongsTo(db.Room);
+db.ImageInfo.belongsTo(db.GameData);
+db.GameData.hasOne(db.ImageInfo);
 
 module.exports = db;

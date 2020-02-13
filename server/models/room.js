@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             defaultValue: 3,
         },
-        game_start: {
+        gameStart: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
