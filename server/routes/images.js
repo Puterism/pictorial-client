@@ -61,14 +61,6 @@ router.post('/upload',
           encodedImg:req.body.encodedImg,   // base64로 인코딩된 이미지
           answer:req.body.answer            // 랜덤으로 정한 이미지 정답
         });
-
-        // res.redirect('../');
-        /* // test code
-          console.log(Object.keys(req.body));
-          console.log(req.body.objDetect);
-          console.log(req.body.detectedObjs);
-          res.send(req.body.objDetect);
-        */        
 }); 
 
 router.post('/update', 

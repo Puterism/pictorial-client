@@ -25,15 +25,6 @@ module.exports = (req, res, next) =>{
         if(err) throw err;
         req.body.encodedImg = encodedImg;
 
-        /* // 테스트 코드. 브라우저에 해당 이미지가 출력되면 정상
-        var decodedImg = Buffer.from(req.body.encodedImg, 'base64');
-  
-        res.writeHead(200, {
-          'Content-Type': 'image/jpg',
-          'Content-Length': decodedImg.length
-        });
-        res.end(decodedImg);
-        */
         next();
     });
 };
