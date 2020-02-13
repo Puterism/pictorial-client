@@ -7,12 +7,20 @@ module.exports = (sequelize, DataTypes) => {
         roomCode: {
             type: DataTypes.STRING(20),
             allowNull: false,
-            unique: true,
         },
         score: {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: true,
             defaultValue: 0,
+        },
+        sessionID: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
+        },
+        is_ready: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: false,
         }
     }, {
         timestamps: false
