@@ -3,18 +3,6 @@ const router = express.Router();
 const nanoid = require('nanoid');
 const db = require('../lib/db');
 
-router.get('/', async (req, res) => {
-    try {
-        const result = await db.getUsersInRoom("b38sdbk");
-        console.log('result: ', result);
-        if(result >= 7) {
-            console.log(`You can't enter the room!`);
-        }
-    } catch (error) {
-        console.error(error);
-    }
-});
-
 router.post('/create', async (req, res) => {
     try {
         const name = req.body.name;
@@ -68,6 +56,7 @@ router.post('/invite', async (req, res) => {
             res.status(400).json({ message: 'The room is Full!' });
             return;
         }
+        res.status(200).json({ status: 'OK' });
     } catch (error) {
         console.error(error);
         res.status(404).json({ error: error });
