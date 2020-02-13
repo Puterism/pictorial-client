@@ -10,4 +10,10 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+db.Room = require('./room')(sequelize, Sequelize);
+db.User = require('./user')(sequelize, Sequelize);
+
+db.Room.hasMany(db.User);
+db.User.belongsTo(db.Room);
+
 module.exports = db;
