@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const nanoid = require('nanoid');
 const db = require('../lib/db');
-const app = express();
 
 router.post('/create', async (req, res) => {
     try {
@@ -79,7 +78,7 @@ router.post('/joinRoom', async (req, res) => {
         const result = await db.addUser(name, roomCode);
 
         // socket join
-        const io = app.get('io');
+        const io = req.app.get('io');
         io.of('/room').emit('join', name, roomCode);
         res.status(200).json({ message: 'successfully join!' });
     } catch (error) {
