@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const cors = require('cors');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const WebSocket = require('./lib/socket');
@@ -30,6 +31,7 @@ const sessionMiddleware = session({
 
 const indexRouter = require('./routes/index');
 app.use('/', indexRouter);
+app.use(cors);
 
 server.listen(port, () => console.log(`Server has started on port ${port}`));
 

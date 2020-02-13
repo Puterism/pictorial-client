@@ -1,5 +1,5 @@
-module.exports = (wequelize, DataTypes) => {
-    return wequelize.define('gameData', {
+module.exports = (sequelize, DataTypes) => {
+    return sequelize.define('gameData', {
         imageName: {
             type: DataTypes.STRING(30),
             allowNull: false,
@@ -7,11 +7,11 @@ module.exports = (wequelize, DataTypes) => {
         },
         isAuto: {
             type: DataTypes.BOOLEAN,
-            allowNull: false,
+            allowNull: true,
         },
         answerAuto: {
             type: DataTypes.STRING(150),
-            allowNull: false,
+            allowNull: true,
         },
         answerManu: {
             type: DataTypes.STRING(150),

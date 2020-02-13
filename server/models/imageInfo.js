@@ -1,5 +1,5 @@
-module.exports = (wequelize, DataTypes) => {
-    return wequelize.define('imageInfo', {
+module.exports = (sequelize, DataTypes) => {
+    return sequelize.define('imageInfo', {
         name: {
             type: DataTypes.STRING(30),
             allowNull: false,

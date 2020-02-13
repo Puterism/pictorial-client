@@ -1,4 +1,4 @@
-const { Room, User } = require('../models');
+const { Room, User, ImageInfo, GameData } = require('../models');
 
 const findRoom = async (code) => {
     const existingRoom = await Room.findAll({where: {code: code}});
@@ -66,4 +66,9 @@ const deleteUser = async (name, roomCode) => {
     return result;
 }
 
-module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser };
+const insertImg = async (name, roomCode, imageName, base64Img, answerAuto) => {
+    const result1 = await ImageInfo.create({name: name, roomCode: roomCode, imageName: imageName});
+    const result2 = await GameData.create({imageName: imageName, answerAuto: answerAuto, base64Img: base64Img});
+}
+
+module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg };
