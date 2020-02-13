@@ -3,7 +3,7 @@ const router = express.Router();
 const nanoid = require('nanoid');
 const db = require('../lib/db');
 
-router.post('/create', (req, res) => {
+router.post('/create', async (req, res) => {
     try {
         const name = req.body.name;
         console.log(name);
@@ -16,13 +16,13 @@ router.post('/create', (req, res) => {
         let roomCode;
         while(1) { // roomCode create
             roomCode = nanoid(10);
-            const exist = db.findRoom(roomCode);
+            const exist = await db.findRoom(roomCode);
             if(!exist) break;
         }
 
         // DB
-        db.addRoom(code);
-        db.addUser(name, code);
+        await db.addRoom(roomCode);
+        await db.addUser(name, roomCode);
 
         res.status(201).json({ roomCode: roomCode });
     } catch (error) {
@@ -32,14 +32,14 @@ router.post('/create', (req, res) => {
     
 });
 
-router.post('/invite', (req, res) => {
+router.post('/invite', async (req, res) => {
     try {
         const roomCode = req.body.roomCode;
         const name = req.body.name;
         console.log(roomCode, name);
 
         // roomCode exist?
-        const exist = db.findRoom(roomCode);
+        const exist = await db.findRoom(roomCode);
         if(!exist) {
             res.status(400).json({ message: 'roomCode don' });
             return;
