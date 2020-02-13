@@ -209,7 +209,7 @@ function Room() {
               <Styled.ListCircle />
               라운드 수
               <Styled.Select>
-                <option selected>
+                <option defaultValue>
                   2
                 </option>
                 <option>
@@ -224,7 +224,7 @@ function Room() {
               <Styled.ListCircle />
               제한 시간
               <Styled.Select>
-                <option selected>
+                <option defaultValue>
                   3s
                 </option>
                 <option>

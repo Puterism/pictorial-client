@@ -32,6 +32,9 @@ const Styled = {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    svg {
+      margin-bottom: 73px;
+    }
   `,
 
   Input: styled.input`
@@ -44,8 +47,8 @@ const Styled = {
     font-family: inherit;
     font-weight: 700;
     font-size: 1.5em;
-    margin-top: 93px;
     letter-spacing: 2.8px;
+    margin-top: 10px;
 
     &::placeholder {
       text-align: center;
@@ -67,11 +70,14 @@ const Styled = {
     margin-top: 29px;
     cursor: pointer;
   `,
+  ErrorMsg: styled.div`
+    color: red;
+  `,
 }
 
 function Join() {
   const [name, setName] = useState('');
-  const { onFetchRoomID, onConnectRoom, onSetCode } = useRoom();
+  const { onFetchRoomID, onConnectRoom, onSetCode, onCheckRoomCode, errorMsg } = useRoom();
   const { code } = useParams();
 
   const handleChangeInput = e => {
@@ -87,15 +93,24 @@ function Join() {
     }
   }
 
-  useEffect(() => {
-    if (code) onSetCode(code);
-  }, [onSetCode, code])
+  useEffect(() => { 
+    if (code) {
+      onSetCode(code);
+      onCheckRoomCode(code);
+    }
+  }, [onSetCode, onCheckRoomCode, code])
 
   return (
     <Styled.Container>
       <Styled.Planet>
         <Styled.Form onSubmit={handleSubmit}>
           <Logo />
+          {
+            errorMsg &&
+            <Styled.ErrorMsg>
+              { errorMsg }
+            </Styled.ErrorMsg>
+          }
           <Styled.Input
             value={name}
             onChange={handleChangeInput}

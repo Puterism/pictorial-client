@@ -3,13 +3,14 @@ import { takeLatest, all, call, put } from 'redux-saga/effects';
 import {
   FETCH_ROOM_CODE, FETCH_ROOM_CODE_SUCCESS, FETCH_ROOM_CODE_FAILURE, 
   CONNECT_ROOM, CONNECT_ROOM_SUCCESS, CONNECT_ROOM_FAILURE,
+  CHECK_ROOM_CODE, CHECK_ROOM_CODE_SUCCESS, CHECK_ROOM_CODE_FAILURE,
 } from '../modules/room';
 import { push } from 'connected-react-router';
-import { createRoom } from '../apis';
+import { createRoom, checkRoomCode, connectRoom } from '../apis';
 // import io from 'socket.io-client';
 
 // function connect() {
-//   const socket = io('/room');
+//   const socket = io('http://pictorial.puterism.com/room');
 //   return new Promise(resolve => {
 //     socket.on('connect', () => {
 //       resolve(socket);
@@ -49,7 +50,7 @@ import { createRoom } from '../apis';
 //   // yield fork(write, socket);
 // }
 
-function* fetchRoomIDSaga(action) {
+function* fetchRoomCodeSaga(action) {
   const { payload } = action;
   if (!payload) return;
 
@@ -63,21 +64,48 @@ function* fetchRoomIDSaga(action) {
   }
 }
 
+function* checkRoomCodeSaga(action) {
+  const { payload } = action;
+  if (!payload) return;
+
+  try {
+    const response = yield call(checkRoomCode, payload);
+    yield put({ type: CHECK_ROOM_CODE_SUCCESS, payload: { ...response, ...payload }});
+    // yield put(push(`/room/${payload.code}`, { code: payload.code }));
+  } catch (error) {
+    yield put({ type: CHECK_ROOM_CODE_FAILURE, payload: error });
+    yield put(push(`/`));
+  }
+}
+
 function* connectRoomSaga(action) {
   const { payload } = action;
   if (!payload) return;
 
   try {
-    // const socket = yield call(connect);
-    // const task = yield fork(handleIO, socket);
-    // socket.emit('join', payload.name, payload.code);
-
-    yield put({ type: CONNECT_ROOM_SUCCESS, payload: { ...payload }});
+    const response = yield call(connectRoom, payload);
+    yield put({ type: CONNECT_ROOM_SUCCESS, payload: { ...response, ...payload }});
     yield put(push(`/room/${payload.code}`, { name: payload.name, code: payload.code }));
   } catch (error) {
-    yield put({ type: CONNECT_ROOM_FAILURE, payload: {  ...error }});
+    yield put({ type: CONNECT_ROOM_FAILURE, payload: { ...error }});
   }
 }
+
+// function* connectRoomSaga(action) {
+//   const { payload } = action;
+//   if (!payload) return;
+
+//   try {
+//     // const socket = yield call(connect);
+//     // const task = yield fork(handleIO, socket);
+//     // socket.emit('join', payload.name, payload.code);
+
+//     yield put({ type: CONNECT_ROOM_SUCCESS, payload: { ...payload }});
+//     yield put(push(`/room/${payload.code}`, { name: payload.name, code: payload.code }));
+//   } catch (error) {
+//     yield put({ type: CONNECT_ROOM_FAILURE, payload: {  ...error }});
+//   }
+// }
 
 // function* flow() {
 //   while (true) {
@@ -95,8 +123,10 @@ function* connectRoomSaga(action) {
 
 export default function* roomSaga() {
   yield all([
-    takeLatest(FETCH_ROOM_CODE, fetchRoomIDSaga),
+    takeLatest(FETCH_ROOM_CODE, fetchRoomCodeSaga),
     takeLatest(CONNECT_ROOM, connectRoomSaga),
+    takeLatest(CHECK_ROOM_CODE, checkRoomCodeSaga),
+    // takeLatest(JOIN_ROOM_WITH_NAME_SAVE, joinRoomWithNameSaveSaga),
     // fork(flow),
   ])
 }

@@ -3,9 +3,7 @@ import {
   Switch,
   Route,
   Redirect,
-  useParams,
 } from 'react-router-dom';
-import useRoom from './hooks/useRoom';
 
 import { ConnectedRouter as Router } from 'connected-react-router';
 import styled, { createGlobalStyle } from 'styled-components';
@@ -41,8 +39,6 @@ const Styled = {
 }
 
 function App() {
-  const { name } = useRoom();
-
   return (
     <Styled.Container bg={bg}>
       <Styled.GlobalStyle />
