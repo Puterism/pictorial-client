@@ -75,7 +75,7 @@ router.post('/joinRoom', async (req, res) => {
         }
 
         // DB
-        const result = await addUser(name, roomCode);
+        const result = await db.addUser(name, roomCode);
 
         // socket join
         const io = app.get('io');
