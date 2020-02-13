@@ -25,7 +25,7 @@ const findUser = async (name, roomCode) => {
     const existingUser = await User.findAll({ where: {name: name, roomCode: roomCode} });
 
     if(existingUser.length > 0) {
-        return { error: '이미 존재하는 이름입니다.'};
+        return true;
     } else {
         return false;
     }

@@ -13,10 +13,6 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             defaultValue: 0,
         },
-        sessionID: {
-            type: DataTypes.STRING(50),
-            allowNull: true,
-        },
         is_ready: {
             type: DataTypes.BOOLEAN,
             allowNull: true,
