@@ -58,12 +58,12 @@ const getUserScore = async (name, roomCode) => {
 }
 
 const deleteRoom = async (roomCode) => {
-    const result = await Room.delete({ where: {code: roomCode} });
+    const result = await Room.destroy({ where: {code: roomCode} });
     return result;
 }
 
 const deleteUser = async (name, roomCode) => {
-    const result = await User.delete({ where: {name: name, roomCode: roomCode}});
+    const result = await User.destroy({ where: {name: name, roomCode: roomCode}});
     return result;
 }
 
