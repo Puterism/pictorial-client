@@ -84,4 +84,9 @@ const isGameStart = async (roomCode) => {
     }
 }
 
+const dbUpdateLabel = async (isAuto, answerManu, imageName) => {
+    const result = await GameData.update( {isAuto: isAuto, answerManu: answerManu}, { where: {imageName: imageName} } );
+    return result;
+}
+
 module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, };

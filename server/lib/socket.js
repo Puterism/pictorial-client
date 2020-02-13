@@ -27,9 +27,21 @@ module.exports = (server, app, sessionMiddleware) => {
             console.log(req.session.userName, req.session.roomCode);
         });
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect', async () => {
             console.log('room disconnected!');
-            // DB 처리
+            if(!req.session.userName || !req.session.roomCode) {
+                // DB 처리
+                const name = req.session.userName;
+                const roomCode = req.session.roomCode;
+
+                const deleteUser = await db.deleteUser(name, roomCode);
+                const userNum = await db.getUsersInRoom(roomCode);
+                if(userNum === 0) {
+                    const deleteRoom = await db.deleteRoom(roomCode);
+                } else {
+                    socket.to(roomCode).emit('exit', { message: `${name}님이 퇴장하셨습니다.`});
+                }
+            }
         }); 
     });
 }
