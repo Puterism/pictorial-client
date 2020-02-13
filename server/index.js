@@ -20,8 +20,8 @@ const sessionMiddleware = session({
     },
 });
 
-const router = require('./routes/index');
-app.use(router);
+const indexRouter = require('./routes/index');
+app.use('/', indexRouter);
 
 server.listen(port, () => console.log(`Server has started on port ${port}`));
 
