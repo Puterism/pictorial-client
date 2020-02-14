@@ -7,10 +7,10 @@
         sequelize 사용법 주의 
 */
 
-var db = require('../lib/db'); // imgInsert, 
+var db = require('./db'); // imgInsert, 
 
 module.exports = (req, res, next) =>{
-    console.log('save2db is called!');
+    console.log('saveImg is called!');
   
     db.insertImg(
         req.body.name,          // 사용자 이름

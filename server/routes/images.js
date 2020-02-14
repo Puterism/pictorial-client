@@ -10,7 +10,7 @@ var request = require('request');                   // for request to NCP api se
 var img2base64 = require('../lib/img2base64');      // make image made by upload(multer) to base64 
 var objDetect = require('../lib/objDetect');        // obj detect query
 var makeAnswer = require('../lib/makeAnswer');      // make possibles and answer
-var save2db= require('../lib/save2db')              // save data to database 
+var saveImg= require('../lib/saveImg')              // save data to database 
 
 /* variables */
 // upload version 1
@@ -53,7 +53,7 @@ router.post('/upload',
     img2base64,                 // img를 base64로 변환하고 req.body.encoded에 저장
     objDetect,                  // img를 ncp object detect 서버에 보내고 결과를 돌려받아 req.body.objDetect_... 에 저장
     makeAnswer,                 // 가능한 정답과 랜덤으로 지정된 이미지의 정답 저장. req.body.possibles, req.body.answers 
-    save2db,                    // 데이터 저장 부분
+    saveImg,                    // 데이터 저장 부분
     (req, res, next)=>{  
           /* 에러 처리 */
           if(req.body.possibles.length<1){ // 동종 객체가 1개 이하일 경우       
