@@ -58,11 +58,7 @@ router.post('/upload',
     saveImg,                    // 데이터 저장 부분
     (req, res, next)=>{  
           /* 에러 처리 */
-          if(req.body.possibles.length<1){ // 동종 객체가 1개 이하일 경우       
-              console.log('error is called!')
-              res.status(400).json({message:"정답 1개 미만"});
-          }
-          else {
+        
             res.json({
               userName:req.body.userName,       // 이미지를 보낸 유저 이름 
               roomCode:req.body.roomCode,       // 방 고유 번호
@@ -70,15 +66,12 @@ router.post('/upload',
               possibles:req.body.possibles,     // 가능한 정답 객체들
               answer:req.body.answer            // 랜덤으로 정한 이미지 정답
             });
-          }
+
 }); 
 
 /* 정답 레이블 처리 */
-router.post('/update', 
-  saveLab,  // isAuto 및 autoManu 저장
-  (req, res, next)=>{
-    res.status(200).json('label save is done');
-  }
+router.get('/ready', 
+ 
 ); 
 
 module.exports = router;
