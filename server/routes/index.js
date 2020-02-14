@@ -50,8 +50,8 @@ router.post('/invite', async (req, res) => {
             return;
         }
         // user full?
-        const userNum = await db.getUsersInRoom(roomCode);
-        if(userNum >= 7) {
+        const userList = await db.getUsersInRoom(roomCode);
+        if(userList.length >= 7) {
             res.status(400).json({ message: 'The room is Full!' });
             return;
         }
