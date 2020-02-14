@@ -4,9 +4,10 @@ import {
   FETCH_ROOM_CODE, FETCH_ROOM_CODE_SUCCESS, FETCH_ROOM_CODE_FAILURE, 
   CONNECT_ROOM, CONNECT_ROOM_SUCCESS, CONNECT_ROOM_FAILURE,
   CHECK_ROOM_CODE, CHECK_ROOM_CODE_SUCCESS, CHECK_ROOM_CODE_FAILURE,
+  IMAGE_READY, IMAGE_READY_SUCCESS, IMAGE_READY_FAILURE
 } from '../modules/room';
 import { push } from 'connected-react-router';
-import { createRoom, checkRoomCode, connectRoom } from '../apis';
+import { createRoom, checkRoomCode, connectRoom, imageReady } from '../apis';
 // import io from 'socket.io-client';
 
 // function connect() {
@@ -91,6 +92,18 @@ function* connectRoomSaga(action) {
   }
 }
 
+function* imageReadySaga(action) {
+  const { payload } = action;
+  if (!payload) return;
+
+  try {
+    const response = yield call(imageReady, payload);
+    yield put({ type: IMAGE_READY_SUCCESS, payload: { ...response }});
+  } catch (error) {
+    yield put({ type: IMAGE_READY_FAILURE, payload: { ...error }});
+  }
+}
+
 // function* connectRoomSaga(action) {
 //   const { payload } = action;
 //   if (!payload) return;
@@ -126,6 +139,7 @@ export default function* roomSaga() {
     takeLatest(FETCH_ROOM_CODE, fetchRoomCodeSaga),
     takeLatest(CONNECT_ROOM, connectRoomSaga),
     takeLatest(CHECK_ROOM_CODE, checkRoomCodeSaga),
+    takeLatest(IMAGE_READY, imageReadySaga),
     // takeLatest(JOIN_ROOM_WITH_NAME_SAVE, joinRoomWithNameSaveSaga),
     // fork(flow),
   ])
