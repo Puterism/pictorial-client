@@ -102,7 +102,7 @@ const dbUpdateLabel = async (isAuto, answerManu, imageName) => {
 }
 
 const setUserReady = async (name, roomCode, ready) => {
-    const result = await User.update( {isReady: ready}, { where: {name: name, roomCpde: roomCode} });
+    const result = await User.update( {isReady: ready}, { where: {name: name, roomCode: roomCode} });
     return result;
 }
 
