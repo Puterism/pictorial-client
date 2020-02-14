@@ -59,10 +59,11 @@ router.post('/upload',
     makeAnswer,                 // 가능한 정답과 랜덤으로 지정된 이미지의 정답 저장. req.body.possibles, req.body.answers 
     save2db,                    // 데이터 저장 부분
     (req, res, next)=>{  
-        res.json({
+          res.json({
           userName:req.body.userName,       // 이미지를 보낸 유저 이름 
           roomCode:req.body.roomCode,       // 방 고유 번호
           encodedImg:req.body.encodedImg,   // base64로 인코딩된 이미지
+          possibles:req.body.possibles,     // 가능한 정답 객체들
           answer:req.body.answer            // 랜덤으로 정한 이미지 정답
         });
 }); 
