@@ -33,6 +33,9 @@ module.exports = (server, app, sessionMiddleware) => {
                 userList.push(result[i].dataValues);
             }
             room.to(code).emit('userData', { userList: userList });
+            
+            const data = await db.getRoomSetting(roomCode);
+            room.to(roomCode).emit('roomData', { roomData: data.dataValues });
         });
 
         socket.on('setRoom', async (roomCode, round, time) => {
