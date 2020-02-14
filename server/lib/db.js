@@ -89,4 +89,4 @@ const dbUpdateLabel = async (isAuto, answerManu, imageName) => {
     return result;
 }
 
-module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, };
+module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, dbUpdateLabel, };
