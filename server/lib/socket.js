@@ -62,7 +62,7 @@ module.exports = (server, app, sessionMiddleware) => {
             for(var i=0; i<result.length; i++) {
                 userList.push(result[i].dataValues);
             }
-            room.to(roomCode).emit('userData', { userList: userList });
+            room.to(roomCode).emit('readyUserData', { userList: userList });
         });
 
         socket.on('score', async (name, roomCode, isCorrect, sec) => {
