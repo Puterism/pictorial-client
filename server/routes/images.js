@@ -73,6 +73,7 @@ router.post('/upload',
 
 router.post('/update', 
   (req, res, next)=>{
+    
     res.send('This page is for test');
   }
 ); 
