@@ -15,9 +15,9 @@ db.User = require('./user')(sequelize, Sequelize);
 db.ImageInfo = require('./imageInfo')(sequelize, Sequelize);
 db.GameData = require('./gameData')(sequelize, Sequelize);
 
-db.Room.hasMany(db.User, { foreignKey: 'roomCode', sourceKey: 'code' });
-db.User.belongsTo(db.Room, { foreignKey: 'roomCode', targetKey: 'code' });
-// db.ImageInfo.hasOne(db.GameData, { foreignKey: 'imageName', targetKey: 'imageName' });
+// db.Room.hasMany(db.User, { foreignKey: 'roomCode', sourceKey: 'code' });
+// db.User.belongsTo(db.Room, { foreignKey: 'roomCode', targetKey: 'code' });
+// db.ImageInfo.belongsTo(db.GameData, { foreignKey: 'imageName', targetKey: 'imageName' });
 // db.GameData.hasOne(db.ImageInfo, { foreignKey: 'imageName', targetKey: 'imageName' });
 
 module.exports = db;
