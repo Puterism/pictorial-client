@@ -10,7 +10,9 @@ var request = require('request');                   // for request to NCP api se
 var img2base64 = require('../lib/img2base64');      // make image made by upload(multer) to base64 
 var objDetect = require('../lib/objDetect');        // obj detect query
 var makeAnswer = require('../lib/makeAnswer');      // make possibles and answer
-var save2db= require('../lib/save2db')              // save data to database 
+var saveImg= require('../lib/saveImg')              // save data to database 
+
+var saveLab= require('../lib/saveLab')              // save data to database 
 
 /* variables */
 // upload version 1
@@ -53,19 +55,29 @@ router.post('/upload',
     img2base64,                 // img를 base64로 변환하고 req.body.encoded에 저장
     objDetect,                  // img를 ncp object detect 서버에 보내고 결과를 돌려받아 req.body.objDetect_... 에 저장
     makeAnswer,                 // 가능한 정답과 랜덤으로 지정된 이미지의 정답 저장. req.body.possibles, req.body.answers 
-    save2db,                    // 데이터 저장 부분
+    saveImg,                    // 데이터 저장 부분
     (req, res, next)=>{  
-        res.json({
-          userName:req.body.userName,       // 이미지를 보낸 유저 이름 
-          roomCode:req.body.roomCode,       // 방 고유 번호
-          encodedImg:req.body.encodedImg,   // base64로 인코딩된 이미지
-          answer:req.body.answer            // 랜덤으로 정한 이미지 정답
-        });
+          /* 에러 처리 */
+          if(req.body.possibles.length<1){ // 동종 객체가 1개 이하일 경우       
+              console.log('error is called!')
+              res.status(400).json({message:"정답 1개 미만"});
+          }
+          else {
+            res.json({
+              userName:req.body.userName,       // 이미지를 보낸 유저 이름 
+              roomCode:req.body.roomCode,       // 방 고유 번호
+              encodedImg:req.body.encodedImg,   // base64로 인코딩된 이미지
+              possibles:req.body.possibles,     // 가능한 정답 객체들
+              answer:req.body.answer            // 랜덤으로 정한 이미지 정답
+            });
+          }
 }); 
 
+/* 정답 레이블 처리 */
 router.post('/update', 
+  saveLab,  // isAuto 및 autoManu 저장
   (req, res, next)=>{
-    res.send('This page is for test');
+    res.status(200).json('label save is done');
   }
 ); 
 
