@@ -206,10 +206,13 @@ function Room() {
       onSetRound(roomData.round);
       onSetTimeLimit(roomData.time);
     });
+    return () => {
+      socket.off('')
+    }
   }, [name, code, onSetMemberList, onSetRound, onSetTimeLimit]);
 
   const handleLinkShare = () => {
-    const url = `http://pictorial.puterism.com/${code}`;
+    const url = `http://pictorial.puterism.com:3001/${code}`;
     const textareaElement = document.createElement('textarea');
     textareaElement.value = url;
     document.body.appendChild(textareaElement);
