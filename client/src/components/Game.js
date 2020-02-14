@@ -162,7 +162,7 @@ function Game() {
   const [nowTime, setNowTime] = useState(timeLimit);
 
   useEffect(() => {
-    socket = io('http://pictorial.puterism.com/room');
+    socket = io('http://pictorial.puterism.com/api/room');
     socket.emit('ready', name, code);
     // console.log(name, code);
     // socket.on('readyUserData', ({userData}) => {
