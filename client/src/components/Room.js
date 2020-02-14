@@ -209,7 +209,7 @@ function Room() {
   }, [name, code, onSetMemberList, onSetRound, onSetTimeLimit]);
 
   const handleLinkShare = () => {
-    const url = `http://localhost:3000/${code}`;
+    const url = `http://pictorial.puterism.com/${code}`;
     const textareaElement = document.createElement('textarea');
     textareaElement.value = url;
     document.body.appendChild(textareaElement);
