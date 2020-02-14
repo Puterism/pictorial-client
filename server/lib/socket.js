@@ -35,12 +35,19 @@ module.exports = (server, app, sessionMiddleware) => {
             room.to(code).emit('userData', { userList: userList });
         });
 
-        socket.on('setRoom', async (roomCode, start) => {
+        socket.on('setRoom', async (roomCode, round, time) => {
+            const result = await db.setRoom(roomCode, round, time);
+            const data = await db.getRoomSetting(roomCode);
+
+            room.to(roomCode).emit('roomData', { roomData: data.dataValues });
+        });
+
+        socket.on('setGameStart', async (roomCode, start) => {
             const result = await db.setGameStart(roomCode, start);
             const data = await db.getRoomSetting(roomCode);
 
             room.to(roomCode).emit('roomData', { roomData: data.dataValues });
-        })
+        });
 
         socket.on('ready', async (name, roomCode) => {
             // DB
