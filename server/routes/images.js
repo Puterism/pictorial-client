@@ -12,6 +12,8 @@ var objDetect = require('../lib/objDetect');        // obj detect query
 var makeAnswer = require('../lib/makeAnswer');      // make possibles and answer
 var saveImg= require('../lib/saveImg')              // save data to database 
 
+var saveLab= require('../lib/saveLab')              // save data to database 
+
 /* variables */
 // upload version 1
 /* var upload = multer({dest: './public/images'}); */
@@ -71,10 +73,11 @@ router.post('/upload',
           }
 }); 
 
+/* 정답 레이블 처리 */
 router.post('/update', 
+  saveLab,  // isAuto 및 autoManu 저장
   (req, res, next)=>{
-    
-    res.send('This page is for test');
+    res.status(200).json('label save is done');
   }
 ); 
 
