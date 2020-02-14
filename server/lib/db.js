@@ -50,7 +50,7 @@ const getReadyUsersInRoom = async (roomCode) => {
 }
 
 const setRoom = async (roomCode, round, time) => {
-    const result = await Room.update( {round: round, time: time}, { where: {romCode: roomCode} });
+    const result = await Room.update( {round: round, time: time}, { where: {roomCode: roomCode} });
     return result;
 }
 

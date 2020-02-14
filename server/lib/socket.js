@@ -99,6 +99,8 @@ module.exports = (server, app, sessionMiddleware) => {
             const name = req.session.userName;
             const roomCode = req.session.roomCode;
 
+            socket.leave(roomCode);
+
             const deleteUser = await db.deleteUser(name, roomCode);
             const result = await db.getUsersInRoom(roomCode);
             if(result.length === 0) {
