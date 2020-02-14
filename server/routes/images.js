@@ -14,6 +14,8 @@ var saveImg= require('../lib/saveImg')              // save data to database
 
 var saveLab= require('../lib/saveLab')              // save data to database 
 
+var getAnswerList = require('../lib/db').getAnswerList; // query room problem and answers
+
 /* variables */
 // upload version 1
 /* var upload = multer({dest: './public/images'}); */
@@ -40,8 +42,8 @@ router.get('/', (req, res, next)=>{
     </head>
     <body>
         <form action="/images/upload" method="post" enctype="multipart/form-data">
-            <p><input type="hidden" name="name" value="kyw"></p>
-            <p><input type="hidden" name="roomCode" value="1234"></p>
+            <p><input type="hidden" name="name" value="C"></p>
+            <p><input type="hidden" name="roomCode" value="2222"></p>
             <p><input type="file" name="IMG_FILE" accept="image/png, image/jpeg"></p>
             <p><input type="submit" value="submit"></p>
         </form>
@@ -71,7 +73,10 @@ router.post('/upload',
 
 /* 정답 레이블 처리 */
 router.get('/ready', 
- 
+  async (req, res, next)=>{
+    const result = await getAnswerList(req.body.code);
+    res.status(200).json({answerList : result});
+  } 
 ); 
 
 module.exports = router;

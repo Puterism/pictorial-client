@@ -69,6 +69,31 @@ const getUserScore = async (name, roomCode) => {
     return result;
 }
 
+const getAnswerList = async (roomCode) => {
+    const result = await ImageInfo.findAll({ where: {roomCode: roomCode} });
+    let imageList = [];
+    for(var i=0; i<result.length; i++) {
+        const object = {
+            name: result[i].dataValues.name,
+            imageName: result[i].dataValues.imageName
+        };
+        imageList.push(object);
+    }
+    console.log(imageList);
+    let answerList = [];
+    for(var i=0; i<result.length; i++) {
+        const result2 = await GameData.findAll({ where: {imageName: imageList[i].imageName} });
+        const object = {
+            name: imageList[i].name,
+            answerAuto: result2[0].dataValues.answerAuto,
+            base64Img: result2[0].dataValues.base64Img
+        };
+        answerList.push(object);
+    }
+    console.log(answerList.length);
+    return answerList;
+}
+
 const deleteRoom = async (roomCode) => {
     const result = await Room.destroy({ where: {code: roomCode} });
     return result;
@@ -111,4 +136,4 @@ const setGameStart = async (roomCode, start) => {
     return result;
 }
 
-module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, getReadyUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, dbUpdateLabel, setUserReady, setGameStart };
+module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, getReadyUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, dbUpdateLabel, setUserReady, setGameStart, getAnswerList };
