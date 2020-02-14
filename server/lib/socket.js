@@ -27,19 +27,19 @@ module.exports = (server, app, sessionMiddleware) => {
             console.log(req.session.userName, req.session.roomCode);
 
             // socket - userList return
-            const result = await db.getUsersInRoom(roomCode);
+            const result = await db.getUsersInRoom(code);
             let userList = [];
             for(var i=0; i<result.length; i++) {
                 userList.push(result[i].dataValues);
             }
-            socket.to(roomCode).emit('userData', { userList: userList });
+            room.to(code).emit('userData', { userList: userList });
         });
 
         socket.on('setRoom', async (roomCode, start) => {
             const result = await db.setGameStart(roomCode, start);
             const data = await db.getRoomSetting(roomCode);
 
-            socket.to(roomCode).emit('roomData', { roomData: data.dataValues });
+            room.to(roomCode).emit('roomData', { roomData: data.dataValues });
         })
 
         socket.on('ready', async (name, roomCode) => {
@@ -52,7 +52,7 @@ module.exports = (server, app, sessionMiddleware) => {
             for(var i=0; i<result.length; i++) {
                 userList.push(result[i].dataValues);
             }
-            socket.to(roomCode).emit('userData', { userList: userList });
+            room.to(roomCode).emit('userData', { userList: userList });
         });
 
         socket.on('score', async (name, roomCode, isCorrect, sec) => {
@@ -83,7 +83,7 @@ module.exports = (server, app, sessionMiddleware) => {
             for(var i=0; i<result.length; i++) {
                 userList.push(result[i].dataValues);
             }
-            socket.to(roomCode).emit('updateScore', { userList: userList });
+            room.to(roomCode).emit('updateScore', { userList: userList });
         });
 
         socket.on('disconnect', async () => {
@@ -101,7 +101,7 @@ module.exports = (server, app, sessionMiddleware) => {
                 for(var i=0; i<result.length; i++) {
                     userList.push(result[i].dataValues);
                 }
-                socket.to(roomCode).emit('userData', { userList: userList });
+                room.to(roomCode).emit('userData', { userList: userList });
             }
         }); 
     });
