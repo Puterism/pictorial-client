@@ -3,19 +3,6 @@ const router = express.Router();
 const nanoid = require('nanoid');
 const db = require('../lib/db');
 
-router.get('/', async (req, res) => {
-    try {
-        const result = await db.getUserScore("a", "abcdefg");
-        console.log('router: ', result.dataValues);
-        const originalScore = result.dataValues.score;
-        console.log('originalScore: ', originalScore);
-        const result2 = await db.setUserScore("a", "abcdefg", originalScore+10);
-        console.log('router2: ', result2.dataValues);
-    } catch (error) {
-        console.error(error);
-    }
-})
-
 router.post('/create', async (req, res) => {
     try {
         const name = req.body.name;
