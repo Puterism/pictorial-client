@@ -1,3 +1,12 @@
+/*
+    기능 
+        업로드한 이미지 정보를 DB에 저장
+    결과 
+
+    주의 사항
+        sequelize 사용법 주의 
+*/
+
 var db = require('../lib/db'); // imgInsert, 
 
 module.exports = (req, res, next) =>{

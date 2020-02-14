@@ -58,7 +58,7 @@ router.post('/upload',
           /* 에러 처리 */
           if(req.body.possibles.length<1){ // 동종 객체가 1개 이하일 경우       
               console.log('error is called!')
-              res.status(404).end('정답으로 가능한 객체 1개 이하.');
+              res.status(400).end('정답으로 가능한 객체 1개 이하.');
           }
           else {
             res.json({
