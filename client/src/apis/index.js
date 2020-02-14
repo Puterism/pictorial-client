@@ -26,3 +26,31 @@ export function connectRoom(payload) {
     return error;
   }
 }
+
+export function imageUpload(payload) {
+  try {
+    console.log(payload.image);
+    const formData = new FormData();
+    formData.append('name', payload.name);
+    formData.append('roomCode', payload.code);
+    formData.append('IMG_FILE', payload.image);
+    
+    const response = axios.post('/images/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+}
+
+export function imageReady(payload) {
+  try {
+    const response = axios.get('/image/ready', { code: payload.code });
+    return response;
+  } catch (error) {
+    return error;
+  }
+}

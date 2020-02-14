@@ -10,8 +10,10 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { history } from './store/configureStore';
 import Join from './components/Join';
 import Room from './components/Room';
+import Game from './components/Game';
 
 import bg from './svgs/BG.svg';
+import ImageUpload from './components/ImageUpload';
 
 const Styled = {
   GlobalStyle: createGlobalStyle`
@@ -53,8 +55,14 @@ function App() {
           <Route exact path="/room">
             <Redirect to="/" />
           </Route>
-          <Route path="/room/:code">
+          <Route exact path="/room/:code">
             <Room />
+          </Route>
+          <Route exact path="/room/:code/upload">
+            <ImageUpload />
+          </Route>
+          <Route exact path="/room/:code/game">
+            <Game />
           </Route>
         </Switch>
       </Router>

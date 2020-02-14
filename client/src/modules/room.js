@@ -14,9 +14,13 @@ export const CHECK_ROOM_CODE_FAILURE = 'room/CHECK_ROOM_CODE_FAILURE';
 export const SET_NAME = 'room/SET_NAME';
 export const SET_CODE = 'room/SET_CODE';
 
-export const JOIN_ROOM_WITH_NAME_SAVE = 'room/JOIN_ROOM_WITH_NAME_SAVE';
-export const JOIN_ROOM_WITH_NAME_SAVE_SUCCESS = 'room/JOIN_ROOM_WITH_NAME_SAVE_SUCCESS';
-export const JOIN_ROOM_WITH_NAME_SAVE_FAILURE = 'room/JOIN_ROOM_WITH_NAME_SAVE_FAILURE';
+export const SET_ROUND = 'room/SET_ROUND';
+export const SET_TIME_LIMIT = 'room/SET_TIME_LIMIT';
+export const SET_MEMBER_LIST = 'room/SET_MEMBER_LIST';
+
+export const IMAGE_READY = 'room/IMAGE_READY';
+export const IMAGE_READY_SUCCESS = 'room/IMAGE_READY_SUCCESS';
+export const IMAGE_READY_FAILURE = 'room/IMAGE_READY_FAILURE';
 
 
 // action
@@ -70,10 +74,45 @@ export const checkRoomCode = (code) => ({
   payload: code,
 });
 
+export const setRound = (round) => ({
+  type: SET_ROUND,
+  payload: round,
+});
+
+export const setTimeLimit = (time) => ({
+  type: SET_TIME_LIMIT,
+  payload: time,
+});
+
+export const setMemberList = (list) => ({
+  type: SET_MEMBER_LIST,
+  payload: list,
+});
+
+export const imageReady = (code) => ({
+  type: IMAGE_READY,
+  payload: code,
+});
+
+export const imageReadySuccess = (response) => ({
+  type: IMAGE_READY_SUCCESS,
+  payload: response,
+});
+
+export const imageReadyFailure = (response) => ({
+  type: IMAGE_READY_FAILURE,
+  payload: response,
+});
+
+
 const initialState = {
   code: '',
   name: '',
+  round: 2,
+  timeLimit: 3,
   connected: false,
+  memberList: [],
+  images: [],
 }
 
 // reducer
@@ -82,14 +121,14 @@ function room(state = initialState, { type, payload }) {
     case FETCH_ROOM_CODE:
       return {
         ...state,
-        status: 'FETCHING',
       };
 
     case FETCH_ROOM_CODE_SUCCESS: 
       return {
         ...state,
-        ...payload.data,
         name: payload.name,
+        code: payload.data.roomCode,
+        connected: true,
       };
 
     case FETCH_ROOM_CODE_FAILURE:
@@ -99,6 +138,7 @@ function room(state = initialState, { type, payload }) {
         code: '',
         name: '',
         showError: true,
+        connected: false,
       };
 
     case CONNECT_ROOM:
@@ -111,6 +151,7 @@ function room(state = initialState, { type, payload }) {
         ...state,
         ...payload,
         connected: true,
+        code: payload.code,
       };
 
     case CONNECT_ROOM_FAILURE:
@@ -143,6 +184,7 @@ function room(state = initialState, { type, payload }) {
       return {
         ...state,
         ...payload,
+        code: payload.code,
       };
 
     case CHECK_ROOM_CODE_FAILURE:
@@ -153,6 +195,42 @@ function room(state = initialState, { type, payload }) {
         connected: false,
         showError: true,
       };
+
+    case SET_ROUND:
+      return {
+        ...state,
+        round: payload,
+      };
+    
+    case SET_TIME_LIMIT:
+      return {
+        ...state,
+        timeLimit: payload,
+      };
+
+    case SET_MEMBER_LIST:
+      return {
+        ...state,
+        memberList: payload,
+      }
+
+    case IMAGE_READY:
+      return {
+        ...state,
+      }
+
+    case IMAGE_READY_SUCCESS:
+      return {
+        ...state,
+        images: payload,
+      }
+    
+    case IMAGE_READY_FAILURE:
+      return {
+        ...state,
+        images: [],
+        showError: true,
+      }
 
     default:
       return state;

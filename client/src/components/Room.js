@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 import io from 'socket.io-client';
 import useRoom from '../hooks/useRoom';
@@ -8,6 +8,7 @@ import Stars from '../svgs/Stars.svg';
 import Circle from '../svgs/circle.svg';
 import SmallCircle from '../svgs/small_circle.svg';
 import AlienL1 from '../svgs/alienL1.svg';
+import LinkShareBtn from '../svgs/link-share-btn.svg';
 import { ReactComponent as Left } from '../svgs/left.svg';
 import { ReactComponent as Right } from '../svgs/right.svg';
 import { ReactComponent as Loading } from '../svgs/loading.svg';
@@ -23,6 +24,7 @@ const Styled = {
     background-size: auto 100%;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    position: relative;
   `,
   Lobby: styled.div`
     display: flex;
@@ -33,6 +35,7 @@ const Styled = {
   Name: styled.h2`
     font-size: 42px;
     color: #ffffff;
+    margin: 45px 0;
   `,
   CharacterSelectContainer: styled.div`
     display: flex;
@@ -166,13 +169,25 @@ const Styled = {
     width: 58px;
     height: 58px;
   `,
+  LinkShareButton: styled.div`
+    background-image: ${`url(${LinkShareBtn})`};
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    width: 278px;
+    height: 66px;
+    background-size: 100% 100%;
+    background-position: center;
+    cursor: pointer;
+  `,
 }
 
 let socket;
 
 function Room() {
+  const [nowPage, setNowPage] = useState('room');
   const { code } = useParams();
-  const { name } = useRoom();
+  const { name, connected, round, timeLimit, memberList, onSetRound, onSetTimeLimit, onSetMemberList } = useRoom();
 
   useEffect(() => {
     socket = io('http://pictorial.puterism.com/room');
@@ -181,125 +196,136 @@ function Room() {
       console.log(name);
       console.log(text);
     });
-  }, [name, code]);
+    socket.on('userData', ({userList}) => {
+      console.log(userList);
+      // const list = userList.filter(user => user.name !== name);
+      onSetMemberList(userList);
+    });
+    socket.on('roomData', ({roomData}) => {
+      console.log(roomData);
+      onSetRound(roomData.round);
+      onSetTimeLimit(roomData.time);
+    });
+  }, [name, code, onSetMemberList, onSetRound, onSetTimeLimit]);
+
+  const handleLinkShare = () => {
+    const url = `http://localhost:3000/${code}`;
+    const textareaElement = document.createElement('textarea');
+    textareaElement.value = url;
+    document.body.appendChild(textareaElement);
+    textareaElement.select();
+    document.execCommand('copy');
+    document.body.removeChild(textareaElement);
+    // alert(`복사되었습니다! ${url}`);
+  }
+
+  const handleChangeRound = (e) => {
+    const value = parseInt(e.target.value);
+    onSetRound(value);
+    socket.emit('setRoom', code, value, timeLimit);
+  }
+
+  const handleChangeTimeLimit = (e) => {
+    const value = parseInt(e.target.value);
+    onSetTimeLimit(value);
+    socket.emit('setRoom', code, round, value);
+  }
+
+  const handleClickStart = () => {
+
+  }
 
   return (
-    <Styled.Container>
-      <Styled.Lobby>
-        {/* <Styled.Name>{ name }</Styled.Name> */}
-        
-        <Styled.Name>KkiYubb</Styled.Name>
-        <Styled.CharacterSelectContainer>
-          <Styled.SelectButton left>
-            <Left />
-          </Styled.SelectButton>
-          <Styled.AlienContainer>
-            <Styled.Alien alien={AlienL1} />
-          </Styled.AlienContainer>
-          <Styled.SelectButton right>
-            <Right />
-          </Styled.SelectButton>
-        </Styled.CharacterSelectContainer>
-        <Styled.MiddleContainer>
-          <Styled.StartButton>
-            START
-          </Styled.StartButton>
-          <Styled.OptionContainer>
-            <Styled.Option>
-              <Styled.ListCircle />
-              라운드 수
-              <Styled.Select>
-                <option defaultValue>
-                  2
-                </option>
-                <option>
-                  3
-                </option>
-                <option>
-                  5
-                </option>
-              </Styled.Select>
-            </Styled.Option>
-            <Styled.Option>
-              <Styled.ListCircle />
-              제한 시간
-              <Styled.Select>
-                <option defaultValue>
-                  3s
-                </option>
-                <option>
-                  5s
-                </option>
-                <option>
-                  10s
-                </option>
-              </Styled.Select>
-            </Styled.Option>
-          </Styled.OptionContainer>
-        </Styled.MiddleContainer>
-        <Styled.MemberListContainer>
-          <Styled.MemberContainer>
-            <Styled.MemberAlienContainer>
-              <Styled.MemberAlien alien={AlienL1} />
-            </Styled.MemberAlienContainer>
-            <Styled.MemberName>Lai_Khan</Styled.MemberName>
-            <Styled.MemberStatus>
-              <Ready />
-            </Styled.MemberStatus>
-          </Styled.MemberContainer>
-          
-          <Styled.MemberContainer>
-            <Styled.MemberAlienContainer>
-              <Styled.MemberAlien alien={AlienL1} />
-            </Styled.MemberAlienContainer>
-            <Styled.MemberName>KkiYubb</Styled.MemberName>
-            <Styled.MemberStatus>
-              <Ready />
-            </Styled.MemberStatus>
-          </Styled.MemberContainer>
-          
-          <Styled.MemberContainer>
-            <Styled.MemberAlienContainer>
-              <Styled.MemberAlien alien={AlienL1} />
-            </Styled.MemberAlienContainer>
-            <Styled.MemberName>SooYeon</Styled.MemberName>
-            <Styled.MemberStatus>
-              <Ready />
-            </Styled.MemberStatus>
-          </Styled.MemberContainer>
-          
-          <Styled.MemberContainer>
-            <Styled.MemberAlienContainer>
-              <Styled.MemberAlien alien={AlienL1} />
-            </Styled.MemberAlienContainer>
-            <Styled.MemberName>LOGE</Styled.MemberName>
-            <Styled.MemberStatus>
-              <Ready />
-            </Styled.MemberStatus>
-          </Styled.MemberContainer>
-          
-          <Styled.MemberContainer>
-            <Styled.MemberAlienContainer>
-              <Styled.MemberAlien alien={AlienL1} />
-            </Styled.MemberAlienContainer>
-            <Styled.MemberName>mold98</Styled.MemberName>
-            <Styled.MemberStatus>
-              <Loading />
-            </Styled.MemberStatus>
-          </Styled.MemberContainer>
-          
-          <Styled.MemberContainer>
-            <Styled.MemberAlienContainer>
-              <Styled.MemberAlien alien={AlienL1} />
-            </Styled.MemberAlienContainer>
-            <Styled.MemberName>Sujebee</Styled.MemberName>
-            <Styled.MemberStatus>
-              <Ready />
-            </Styled.MemberStatus>
-          </Styled.MemberContainer>
-        </Styled.MemberListContainer>
-      </Styled.Lobby>
-    </Styled.Container>
+    <>
+    {
+      nowPage === 'room' &&
+      <Styled.Container>
+        {
+          !connected &&
+          <Redirect to="/"></Redirect>
+        }
+        <Styled.LinkShareButton onClick={handleLinkShare} />
+        <Styled.Lobby>
+          <Styled.Name>{ name }</Styled.Name>
+          <Styled.CharacterSelectContainer>
+            {/* <Styled.SelectButton left>
+              <Left />
+            </Styled.SelectButton> */}
+            <Styled.AlienContainer>
+              <Styled.Alien alien={AlienL1} />
+            </Styled.AlienContainer>
+            {/* <Styled.SelectButton right>
+              <Right />
+            </Styled.SelectButton> */}
+          </Styled.CharacterSelectContainer>
+          <Styled.MiddleContainer>
+            <Link onClick={handleClickStart} to={`/room/${code}/upload`}>
+              <Styled.StartButton>
+                START
+              </Styled.StartButton>
+            </Link>
+            <Styled.OptionContainer>
+              <Styled.Option>
+                <Styled.ListCircle />
+                라운드 수
+                <Styled.Select value={round} onChange={handleChangeRound}>
+                  <option value={2} defaultValue>
+                    2
+                  </option>
+                  <option value={3}>
+                    3
+                  </option>
+                  <option value={5}>
+                    5
+                  </option>
+                </Styled.Select>
+              </Styled.Option>
+              <Styled.Option>
+                <Styled.ListCircle />
+                제한 시간
+                <Styled.Select value={timeLimit} onChange={handleChangeTimeLimit}>
+                  <option value={3} defaultValue>
+                    3s
+                  </option>
+                  <option value={5}>
+                    5s
+                  </option>
+                  <option value={10}>
+                    10s
+                  </option>
+                </Styled.Select>
+              </Styled.Option>
+            </Styled.OptionContainer>
+          </Styled.MiddleContainer>
+          <Styled.MemberListContainer>
+            { 
+              memberList.filter(member => member.name !== name).map((member) => (
+                <Styled.MemberContainer key={member.id}>
+                  <Styled.MemberAlienContainer>
+                    <Styled.MemberAlien alien={AlienL1} />
+                  </Styled.MemberAlienContainer>
+                  <Styled.MemberName>{ member.name }</Styled.MemberName>
+                  <Styled.MemberStatus>
+                    <Ready />
+                  </Styled.MemberStatus>
+                </Styled.MemberContainer>
+              ))
+            }
+          </Styled.MemberListContainer>
+        </Styled.Lobby>
+      </Styled.Container>
+    }
+
+    {/* {
+      nowPage === 'imageUpload' &&
+      <ImageUpload />
+    }
+    
+    {
+      nowPage === 'game' &&
+      <Game /> */}
+    }
+    </>
   )
 }
 
