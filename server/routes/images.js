@@ -49,23 +49,26 @@ router.get('/', (req, res, next)=>{
 
 /* 이미지 업로드 처리 */
 router.post('/upload', 
-    (req, res, next)=>{
-      console.log(req.body);
-      next();
-    }, 
     upload.single('IMG_FILE'),  // post 방식으로 전달된 이미지 해석
     img2base64,                 // img를 base64로 변환하고 req.body.encoded에 저장
     objDetect,                  // img를 ncp object detect 서버에 보내고 결과를 돌려받아 req.body.objDetect_... 에 저장
     makeAnswer,                 // 가능한 정답과 랜덤으로 지정된 이미지의 정답 저장. req.body.possibles, req.body.answers 
     save2db,                    // 데이터 저장 부분
     (req, res, next)=>{  
-          res.json({
-          userName:req.body.userName,       // 이미지를 보낸 유저 이름 
-          roomCode:req.body.roomCode,       // 방 고유 번호
-          encodedImg:req.body.encodedImg,   // base64로 인코딩된 이미지
-          possibles:req.body.possibles,     // 가능한 정답 객체들
-          answer:req.body.answer            // 랜덤으로 정한 이미지 정답
-        });
+          /* 에러 처리 */
+          if(req.body.possibles.length<1){ // 동종 객체가 1개 이하일 경우       
+              console.log('error is called!')
+              res.status(404).end('정답으로 가능한 객체 1개 이하.');
+          }
+          else {
+            res.json({
+              userName:req.body.userName,       // 이미지를 보낸 유저 이름 
+              roomCode:req.body.roomCode,       // 방 고유 번호
+              encodedImg:req.body.encodedImg,   // base64로 인코딩된 이미지
+              possibles:req.body.possibles,     // 가능한 정답 객체들
+              answer:req.body.answer            // 랜덤으로 정한 이미지 정답
+            });
+          }
 }); 
 
 router.post('/update', 
