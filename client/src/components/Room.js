@@ -190,7 +190,7 @@ function Room() {
   const { name, connected, round, timeLimit, memberList, onSetRound, onSetTimeLimit, onSetMemberList } = useRoom();
 
   useEffect(() => {
-    socket = io('http://pictorial.puterism.com/room');
+    socket = io('http://pictorial.puterism.com/api/room');
     socket.emit('join', name, code);
     socket.on('message', ({text}) => {
       console.log(name);
