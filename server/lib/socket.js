@@ -14,7 +14,7 @@ module.exports = (server, app, sessionMiddleware) => {
         console.log('socket.io room connected!');
         const req = socket.request;
 
-        socket.on('join', (name, code) => {
+        socket.on('join', async (name, code) => {
             console.log('room join!');
             
             socket.emit('message', { text: `Welcome to the room ${code}!`});
@@ -25,6 +25,65 @@ module.exports = (server, app, sessionMiddleware) => {
             req.session.userName = name;
             req.session.roomCode = code;
             console.log(req.session.userName, req.session.roomCode);
+
+            // socket - userList return
+            const result = await db.getUsersInRoom(roomCode);
+            let userList = [];
+            for(var i=0; i<result.length; i++) {
+                userList.push(result[i].dataValues);
+            }
+            socket.to(roomCode).emit('userData', { userList: userList });
+        });
+
+        socket.on('setRoom', async (roomCode, start) => {
+            const result = await db.setGameStart(roomCode, start);
+            const data = await db.getRoomSetting(roomCode);
+
+            socket.to(roomCode).emit('roomData', { roomData: data.dataValues });
+        })
+
+        socket.on('ready', async (name, roomCode) => {
+            // DB
+            const ready = await db.setUserReady(name, roomCode, true);
+
+            // ready userList
+            const result = await db.getReadyUsersInRoom(roomCode);
+            let userList = [];
+            for(var i=0; i<result.length; i++) {
+                userList.push(result[i].dataValues);
+            }
+            socket.to(roomCode).emit('userData', { userList: userList });
+        });
+
+        socket.on('score', async (name, roomCode, isCorrect, sec) => {
+            // calculate score
+            let score;
+            if(isCorrect) {
+                const room = await db.getRoomSetting(roomCode);
+                const time = room.dataValues.time;
+                score = (10-sec)*50;
+                if(time === 3) {
+                    score += 30;
+                } else if(time === 5) {
+                    score += 10;
+                }
+            } else {
+                score = -50;
+            }
+            console.log('result score: ', score);
+
+            // DB
+            const user = await db.getUserScore(name, roomCode);
+            const originalScore = user.dataValues.score;
+            const updateScore = await db.setUserScore(name, roomCode, originalScore+score);
+
+            // socket - updateScore return
+            const result = await db.getUsersInRoom(roomCode);
+            let userList = [];
+            for(var i=0; i<result.length; i++) {
+                userList.push(result[i].dataValues);
+            }
+            socket.to(roomCode).emit('updateScore', { userList: userList });
         });
 
         socket.on('disconnect', async () => {
@@ -34,11 +93,15 @@ module.exports = (server, app, sessionMiddleware) => {
             const roomCode = req.session.roomCode;
 
             const deleteUser = await db.deleteUser(name, roomCode);
-            const userNum = await db.getUsersInRoom(roomCode);
-            if(userNum === 0) {
+            const result = await db.getUsersInRoom(roomCode);
+            if(result.length === 0) {
                 const deleteRoom = await db.deleteRoom(roomCode);
             } else {
-                socket.to(roomCode).emit('exit', { message: `${name}님이 퇴장하셨습니다.`});
+                let userList = [];
+                for(var i=0; i<result.length; i++) {
+                    userList.push(result[i].dataValues);
+                }
+                socket.to(roomCode).emit('userData', { userList: userList });
             }
         }); 
     });

@@ -3,6 +3,19 @@ const router = express.Router();
 const nanoid = require('nanoid');
 const db = require('../lib/db');
 
+router.get('/', async (req, res) => {
+    try {
+        const result = await db.getUserScore("a", "abcdefg");
+        console.log('router: ', result.dataValues);
+        const originalScore = result.dataValues.score;
+        console.log('originalScore: ', originalScore);
+        const result2 = await db.setUserScore("a", "abcdefg", originalScore+10);
+        console.log('router2: ', result2.dataValues);
+    } catch (error) {
+        console.error(error);
+    }
+})
+
 router.post('/create', async (req, res) => {
     try {
         const name = req.body.name;
@@ -50,8 +63,8 @@ router.post('/invite', async (req, res) => {
             return;
         }
         // user full?
-        const userNum = await db.getUsersInRoom(roomCode);
-        if(userNum >= 7) {
+        const userList = await db.getUsersInRoom(roomCode);
+        if(userList.length >= 7) {
             res.status(400).json({ message: 'The room is Full!' });
             return;
         }

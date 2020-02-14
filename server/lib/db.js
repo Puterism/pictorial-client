@@ -31,10 +31,22 @@ const findUser = async (name, roomCode) => {
     }
 }
 
+// const getUserNumInRoom = async (roomCode) => {
+//     const result = await User.findAndCountAll({ where: {roomCode: roomCode} });
+//     console.log(result.count);
+//     return result.count;
+// }
+
 const getUsersInRoom = async (roomCode) => {
-    const result = await User.findAndCountAll({ where: {roomCode: roomCode} });
-    console.log(result.count);
-    return result.count;
+    const result = await User.findAll({ where: {roomCode: roomCode} });
+    console.log(result);
+    return result;
+}
+
+const getReadyUsersInRoom = async (roomCode) => {
+    const result = await User.findAll({ where: {roomCode: roomCode, isReady: true} });
+    console.log(result);
+    return result;
 }
 
 const setRoom = async (roomCode, round, time) => {
@@ -48,12 +60,12 @@ const getRoomSetting = async (roomCode) => {
 }
 
 const setUserScore = async (name, roomCode, score) => {
-    const result = await User.update( {score: score}, { where: {name: name, roomCpde: roomCode} });
+    const result = await User.update( {score: score}, { where: {name: name, roomCode: roomCode} });
     return result;
 }
 
 const getUserScore = async (name, roomCode) => {
-    const result = await User.findOne( {score: score}, { where: {name: name, roomCpde: roomCode} });
+    const result = await User.findOne( { where: {name: name, roomCode: roomCode} });
     return result;
 }
 
@@ -89,4 +101,14 @@ const dbUpdateLabel = async (isAuto, answerManu, imageName) => {
     return result;
 }
 
-module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, dbUpdateLabel, };
+const setUserReady = async (name, roomCode, ready) => {
+    const result = await User.update( {isReady: ready}, { where: {name: name, roomCpde: roomCode} });
+    return result;
+}
+
+const setGameStart = async (roomCode, start) => {
+    const result = await Room.update( {gameStart: start}, { where: {code: roomCode} });
+    return result;
+}
+
+module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, getReadyUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, dbUpdateLabel, setUserReady, setGameStart };
