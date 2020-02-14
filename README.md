@@ -33,3 +33,7 @@ Pictorial은 스피드 그림 찾기 멀티플레이 웹 게임입니다.
 백엔드 : Node.js, Express.js, MySQL, socket.io
 
 네이버 AI 서비스 : Object Detection API
+
+## URI
+
+pictogram.puterism.com
