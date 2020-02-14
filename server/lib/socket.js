@@ -34,7 +34,7 @@ module.exports = (server, app, sessionMiddleware) => {
             }
             room.to(code).emit('userData', { userList: userList });
             
-            const data = await db.getRoomSetting(roomCode);
+            const data = await db.getRoomSetting(code);
             room.to(roomCode).emit('roomData', { roomData: data.dataValues });
         });
 
