@@ -14,6 +14,8 @@ var saveImg= require('../lib/saveImg')              // save data to database
 
 var saveLab= require('../lib/saveLab')              // save data to database 
 
+var getAnswerList = require('../lib/db').getAnswerList; // query room problem and answers
+
 /* variables */
 // upload version 1
 /* var upload = multer({dest: './public/images'}); */
@@ -40,8 +42,8 @@ router.get('/', (req, res, next)=>{
     </head>
     <body>
         <form action="/images/upload" method="post" enctype="multipart/form-data">
-            <p><input type="hidden" name="name" value="kyw"></p>
-            <p><input type="hidden" name="roomCode" value="1234"></p>
+            <p><input type="hidden" name="name" value="C"></p>
+            <p><input type="hidden" name="roomCode" value="2222"></p>
             <p><input type="file" name="IMG_FILE" accept="image/png, image/jpeg"></p>
             <p><input type="submit" value="submit"></p>
         </form>
@@ -58,11 +60,7 @@ router.post('/upload',
     saveImg,                    // 데이터 저장 부분
     (req, res, next)=>{  
           /* 에러 처리 */
-          if(req.body.possibles.length<1){ // 동종 객체가 1개 이하일 경우       
-              console.log('error is called!')
-              res.status(400).json({message:"정답 1개 미만"});
-          }
-          else {
+        
             res.json({
               userName:req.body.userName,       // 이미지를 보낸 유저 이름 
               roomCode:req.body.roomCode,       // 방 고유 번호
@@ -70,15 +68,15 @@ router.post('/upload',
               possibles:req.body.possibles,     // 가능한 정답 객체들
               answer:req.body.answer            // 랜덤으로 정한 이미지 정답
             });
-          }
+
 }); 
 
 /* 정답 레이블 처리 */
-router.post('/update', 
-  saveLab,  // isAuto 및 autoManu 저장
-  (req, res, next)=>{
-    res.status(200).json('label save is done');
-  }
+router.get('/ready', 
+  async (req, res, next)=>{
+    const result = await getAnswerList(req.body.code);
+    res.status(200).json({answerList : result});
+  } 
 ); 
 
 module.exports = router;
