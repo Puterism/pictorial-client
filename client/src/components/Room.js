@@ -207,6 +207,9 @@ function Room() {
       onSetRound(roomData.round);
       onSetTimeLimit(roomData.time);
     });
+    return () => {
+      socket.off('')
+    }
   }, [name, code, onSetMemberList, onSetRound, onSetTimeLimit]);
 
   const handleLinkShare = () => {
@@ -217,7 +220,6 @@ function Room() {
     textareaElement.select();
     document.execCommand('copy');
     document.body.removeChild(textareaElement);
-    // alert(`복사되었습니다! ${url}`);
   }
 
   const handleChangeRound = (e) => {

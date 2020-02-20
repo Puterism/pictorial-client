@@ -43,14 +43,16 @@ module.exports = (req, res, next) =>{
     if(possibles.length>0)  {
         answer = possibles[getRandomInt(0, possibles.length)];
     }
-    
-    /* 에러 처리 */
-    if(possibles.lenth<1){ // 동종 객체가 1개 이하일 경우 
-        res.status(406).end('정답으로 가능한 객체 1개 이하.');
-    }
 
+    /*에러 처리 */
+    if(possibles.length<1){ // 동종 객체가 1개 이하일 경우       
+        console.log('error is called!')
+        res.status(400).json({message:"정답 1개 미만"});
+    }
     /* request 처리  */
+    else { 
     req.body.possibles = possibles;         // 가능한 정답들의 배열
     req.body.answer = answer;             // 이미지의 정답 
     next();
+    }
 };

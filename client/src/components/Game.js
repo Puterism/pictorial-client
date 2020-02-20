@@ -163,7 +163,7 @@ function Game() {
   const [nowTime, setNowTime] = useState(timeLimit);
 
   useEffect(() => {
-    socket = io(`${END_POINT}/api/room`);
+    socket = io(`${END_POINT}/room`);
     socket.emit('ready', name, code);
     // console.log(name, code);
     // socket.on('readyUserData', ({userData}) => {

@@ -31,14 +31,26 @@ const findUser = async (name, roomCode) => {
     }
 }
 
+// const getUserNumInRoom = async (roomCode) => {
+//     const result = await User.findAndCountAll({ where: {roomCode: roomCode} });
+//     console.log(result.count);
+//     return result.count;
+// }
+
 const getUsersInRoom = async (roomCode) => {
-    const result = await User.findAndCountAll({ where: {roomCode: roomCode} });
-    console.log(result.count);
-    return result.count;
+    const result = await User.findAll({ where: {roomCode: roomCode} });
+    console.log(result);
+    return result;
+}
+
+const getReadyUsersInRoom = async (roomCode) => {
+    const result = await User.findAll({ where: {roomCode: roomCode, isReady: true} });
+    console.log(result);
+    return result;
 }
 
 const setRoom = async (roomCode, round, time) => {
-    const result = await Room.update( {round: round, time: time}, { where: {romCode: roomCode} });
+    const result = await Room.update( {round: round, time: time}, { where: {code: roomCode} });
     return result;
 }
 
@@ -48,13 +60,38 @@ const getRoomSetting = async (roomCode) => {
 }
 
 const setUserScore = async (name, roomCode, score) => {
-    const result = await User.update( {score: score}, { where: {name: name, roomCpde: roomCode} });
+    const result = await User.update( {score: score}, { where: {name: name, roomCode: roomCode} });
     return result;
 }
 
 const getUserScore = async (name, roomCode) => {
-    const result = await User.findOne( {score: score}, { where: {name: name, roomCpde: roomCode} });
+    const result = await User.findOne( { where: {name: name, roomCode: roomCode} });
     return result;
+}
+
+const getAnswerList = async (roomCode) => {
+    const result = await ImageInfo.findAll({ where: {roomCode: roomCode} });
+    let imageList = [];
+    for(var i=0; i<result.length; i++) {
+        const object = {
+            name: result[i].dataValues.name,
+            imageName: result[i].dataValues.imageName
+        };
+        imageList.push(object);
+    }
+    console.log(imageList);
+    let answerList = [];
+    for(var i=0; i<result.length; i++) {
+        const result2 = await GameData.findAll({ where: {imageName: imageList[i].imageName} });
+        const object = {
+            name: imageList[i].name,
+            answerAuto: result2[0].dataValues.answerAuto,
+            base64Img: result2[0].dataValues.base64Img
+        };
+        answerList.push(object);
+    }
+    console.log(answerList.length);
+    return answerList;
 }
 
 const deleteRoom = async (roomCode) => {
@@ -89,4 +126,14 @@ const dbUpdateLabel = async (isAuto, answerManu, imageName) => {
     return result;
 }
 
-module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, };
+const setUserReady = async (name, roomCode, ready) => {
+    const result = await User.update( {isReady: ready}, { where: {name: name, roomCode: roomCode} });
+    return result;
+}
+
+const setGameStart = async (roomCode, start) => {
+    const result = await Room.update( {gameStart: start}, { where: {code: roomCode} });
+    return result;
+}
+
+module.exports = { findRoom, addRoom, addUser, findUser, getUsersInRoom, getReadyUsersInRoom, setRoom, getRoomSetting, setUserScore, getUserScore, deleteRoom, deleteUser, insertImg, isGameStart, dbUpdateLabel, setUserReady, setGameStart, getAnswerList };

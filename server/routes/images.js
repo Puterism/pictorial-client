@@ -10,7 +10,11 @@ var request = require('request');                   // for request to NCP api se
 var img2base64 = require('../lib/img2base64');      // make image made by upload(multer) to base64 
 var objDetect = require('../lib/objDetect');        // obj detect query
 var makeAnswer = require('../lib/makeAnswer');      // make possibles and answer
-var save2db= require('../lib/save2db')              // save data to database 
+var saveImg= require('../lib/saveImg')              // save data to database 
+
+var saveLab= require('../lib/saveLab')              // save data to database 
+
+var getAnswerList = require('../lib/db').getAnswerList; // query room problem and answers
 
 /* variables */
 // upload version 1
@@ -38,8 +42,8 @@ router.get('/', (req, res, next)=>{
     </head>
     <body>
         <form action="/images/upload" method="post" enctype="multipart/form-data">
-            <p><input type="hidden" name="name" value="kyw"></p>
-            <p><input type="hidden" name="roomCode" value="1234"></p>
+            <p><input type="hidden" name="name" value="C"></p>
+            <p><input type="hidden" name="roomCode" value="2222"></p>
             <p><input type="file" name="IMG_FILE" accept="image/png, image/jpeg"></p>
             <p><input type="submit" value="submit"></p>
         </form>
@@ -53,20 +57,26 @@ router.post('/upload',
     img2base64,                 // img를 base64로 변환하고 req.body.encoded에 저장
     objDetect,                  // img를 ncp object detect 서버에 보내고 결과를 돌려받아 req.body.objDetect_... 에 저장
     makeAnswer,                 // 가능한 정답과 랜덤으로 지정된 이미지의 정답 저장. req.body.possibles, req.body.answers 
-    save2db,                    // 데이터 저장 부분
+    saveImg,                    // 데이터 저장 부분
     (req, res, next)=>{  
-        res.json({
-          userName:req.body.userName,       // 이미지를 보낸 유저 이름 
-          roomCode:req.body.roomCode,       // 방 고유 번호
-          encodedImg:req.body.encodedImg,   // base64로 인코딩된 이미지
-          answer:req.body.answer            // 랜덤으로 정한 이미지 정답
-        });
+          /* 에러 처리 */
+        
+            res.json({
+              userName:req.body.userName,       // 이미지를 보낸 유저 이름 
+              roomCode:req.body.roomCode,       // 방 고유 번호
+              encodedImg:req.body.encodedImg,   // base64로 인코딩된 이미지
+              possibles:req.body.possibles,     // 가능한 정답 객체들
+              answer:req.body.answer            // 랜덤으로 정한 이미지 정답
+            });
+
 }); 
 
-router.post('/update', 
-  (req, res, next)=>{
-    res.send('This page is for test');
-  }
+/* 정답 레이블 처리 */
+router.get('/ready', 
+  async (req, res, next)=>{
+    const result = await getAnswerList(req.body.code);
+    res.status(200).json({answerList : result});
+  } 
 ); 
 
 module.exports = router;
