@@ -182,6 +182,7 @@ const Styled = {
   `,
 }
 
+const END_POINT = 'https://pictorial.ga';
 let socket;
 
 function Room() {
@@ -190,7 +191,7 @@ function Room() {
   const { name, connected, round, timeLimit, memberList, onSetRound, onSetTimeLimit, onSetMemberList } = useRoom();
 
   useEffect(() => {
-    socket = io('http://pictorial.puterism.com/api/room');
+    socket = io(`${END_POINT}/api/room`);
     socket.emit('join', name, code);
     socket.on('message', ({text}) => {
       console.log(name);
