@@ -18,6 +18,7 @@ app.use(bodyParser.urlencoded({ extended: false}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
 sequelize.sync();
 
 const sessionMiddleware = session({
@@ -34,7 +35,6 @@ const indexRouter = require('./routes/index');
 const imageRouter = require('./routes/images');
 app.use('/', indexRouter);
 app.use('/images', imageRouter);  
-app.use(cors);
 
 server.listen(port, () => console.log(`Server has started on port ${port}`));
 

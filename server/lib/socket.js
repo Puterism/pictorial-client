@@ -15,7 +15,7 @@ module.exports = (server, app, sessionMiddleware) => {
         const req = socket.request;
 
         socket.on('join', async (name, code) => {
-            console.log('room join!');
+            console.log('socket.io room join!');
             
             socket.emit('message', { text: `Welcome to the room ${code}!`});
             socket.broadcast.to(code).emit('message', { text: `${name}, has joined!`});
@@ -24,7 +24,7 @@ module.exports = (server, app, sessionMiddleware) => {
 
             req.session.userName = name;
             req.session.roomCode = code;
-            console.log(req.session.userName, req.session.roomCode);
+            console.log("username: ", req.session.userName, ", roomCode: ", req.session.roomCode);
 
             // socket - userList return
             const result = await db.getUsersInRoom(code);
@@ -39,6 +39,8 @@ module.exports = (server, app, sessionMiddleware) => {
         });
 
         socket.on('setRoom', async (roomCode, round, time) => {
+            console.log('socket.io room setRoom!');
+
             const result = await db.setRoom(roomCode, round, time);
             const data = await db.getRoomSetting(roomCode);
 
@@ -46,6 +48,8 @@ module.exports = (server, app, sessionMiddleware) => {
         });
 
         socket.on('setGameStart', async (roomCode, start) => {
+            console.log('socket.io room setGameStart!');
+
             const result = await db.setGameStart(roomCode, start);
             const data = await db.getRoomSetting(roomCode);
 
@@ -53,6 +57,8 @@ module.exports = (server, app, sessionMiddleware) => {
         });
 
         socket.on('ready', async (name, roomCode) => {
+            console.log('socket.io room ready!');
+
             // DB
             const ready = await db.setUserReady(name, roomCode, true);
 
@@ -66,6 +72,8 @@ module.exports = (server, app, sessionMiddleware) => {
         });
 
         socket.on('score', async (name, roomCode, isCorrect, sec) => {
+            console.log('socket.io room score!');
+
             // calculate score
             let score;
             if(isCorrect) {
@@ -97,7 +105,7 @@ module.exports = (server, app, sessionMiddleware) => {
         });
 
         socket.on('disconnect', async () => {
-            console.log('room disconnected!');
+            console.log('socket.io room disconnected!');
             // DB 처리
             const name = req.session.userName;
             const roomCode = req.session.roomCode;
