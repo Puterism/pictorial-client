@@ -210,7 +210,7 @@ function Room() {
   }, [name, code, onSetMemberList, onSetRound, onSetTimeLimit]);
 
   const handleLinkShare = () => {
-    const url = `http://pictorial.puterism.com/${code}`;
+    const url = `https://pictorial.surge.sh/${code}`;
     const textareaElement = document.createElement('textarea');
     textareaElement.value = url;
     document.body.appendChild(textareaElement);
