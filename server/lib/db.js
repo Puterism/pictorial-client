@@ -2,7 +2,6 @@ const { Room, User, ImageInfo, GameData } = require('../models');
 
 const findRoom = async (code) => {
     const existingRoom = await Room.findAll({where: {code: code}});
-    console.log('result: ', existingRoom);
 
     if(existingRoom.length > 0) {
         return true;
@@ -31,21 +30,13 @@ const findUser = async (name, roomCode) => {
     }
 }
 
-// const getUserNumInRoom = async (roomCode) => {
-//     const result = await User.findAndCountAll({ where: {roomCode: roomCode} });
-//     console.log(result.count);
-//     return result.count;
-// }
-
 const getUsersInRoom = async (roomCode) => {
     const result = await User.findAll({ where: {roomCode: roomCode} });
-    console.log(result);
     return result;
 }
 
 const getReadyUsersInRoom = async (roomCode) => {
     const result = await User.findAll({ where: {roomCode: roomCode, isReady: true} });
-    console.log(result);
     return result;
 }
 
@@ -79,7 +70,6 @@ const getAnswerList = async (roomCode) => {
         };
         imageList.push(object);
     }
-    console.log(imageList);
     let answerList = [];
     for(var i=0; i<result.length; i++) {
         const result2 = await GameData.findAll({ where: {imageName: imageList[i].imageName} });
@@ -90,7 +80,6 @@ const getAnswerList = async (roomCode) => {
         };
         answerList.push(object);
     }
-    console.log(answerList.length);
     return answerList;
 }
 
@@ -111,12 +100,9 @@ const insertImg = async (name, roomCode, imageName, base64Img, answerAuto) => {
 
 const isGameStart = async (roomCode) => {
     const result = await Room.findOne({ where: {code: roomCode} });
-    console.log(result.dataValues);
     if(result.dataValues.gameStart) {
-        console.log('true: ', result.dataValues.gameStart)
         return true;
     } else {
-        console.log('false: ', result.dataValues.gameStart);
         return false;
     }
 }
