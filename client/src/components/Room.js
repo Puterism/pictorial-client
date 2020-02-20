@@ -191,7 +191,7 @@ function Room() {
   const { name, connected, round, timeLimit, memberList, onSetRound, onSetTimeLimit, onSetMemberList } = useRoom();
 
   useEffect(() => {
-    socket = io(`${END_POINT}/api/room`);
+    socket = io(`${END_POINT}/room`);
     socket.emit('join', name, code);
     socket.on('message', ({text}) => {
       console.log(name);
