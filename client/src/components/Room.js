@@ -182,6 +182,7 @@ const Styled = {
   `,
 }
 
+const END_POINT = 'https://pictorial.ga';
 let socket;
 
 function Room() {
@@ -190,7 +191,7 @@ function Room() {
   const { name, connected, round, timeLimit, memberList, onSetRound, onSetTimeLimit, onSetMemberList } = useRoom();
 
   useEffect(() => {
-    socket = io('http://pictorial.puterism.com:3001/room');
+    socket = io(`${END_POINT}/room`);
     socket.emit('join', name, code);
     socket.on('message', ({text}) => {
       console.log(name);
@@ -212,14 +213,13 @@ function Room() {
   }, [name, code, onSetMemberList, onSetRound, onSetTimeLimit]);
 
   const handleLinkShare = () => {
-    const url = `http://pictorial.puterism.com:3001/${code}`;
+    const url = `https://pictorial.surge.sh/${code}`;
     const textareaElement = document.createElement('textarea');
     textareaElement.value = url;
     document.body.appendChild(textareaElement);
     textareaElement.select();
     document.execCommand('copy');
     document.body.removeChild(textareaElement);
-    // alert(`복사되었습니다! ${url}`);
   }
 
   const handleChangeRound = (e) => {

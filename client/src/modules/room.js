@@ -134,7 +134,7 @@ function room(state = initialState, { type, payload }) {
     case FETCH_ROOM_CODE_FAILURE:
       return {
         ...state,
-        ...payload.response.data,
+        ...payload.data,
         code: '',
         name: '',
         showError: true,

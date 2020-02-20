@@ -154,6 +154,7 @@ const Styled = {
   `,
 }
 
+const END_POINT = 'https://pictorial.ga';
 let socket;
 
 function Game() {
@@ -162,7 +163,7 @@ function Game() {
   const [nowTime, setNowTime] = useState(timeLimit);
 
   useEffect(() => {
-    socket = io('http://pictorial.puterism.com:3001/room');
+    socket = io(`${END_POINT}/room`);
     socket.emit('ready', name, code);
     // console.log(name, code);
     // socket.on('readyUserData', ({userData}) => {
