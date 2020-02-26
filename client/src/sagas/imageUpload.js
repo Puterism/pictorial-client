@@ -1,4 +1,4 @@
-import { takeLatest, all, call, put, select } from 'redux-saga/effects';
+import { takeLatest, call, put, select } from 'redux-saga/effects';
 import { UPLOAD_IMAGE, UPLOAD_IMAGE_SUCCESS, UPLOAD_IMAGE_FAILURE } from "../modules/imageUpload";
 import { imageUpload } from '../apis'
 
@@ -19,7 +19,5 @@ function* uploadImage(action) {
 }
 
 export default function* imageUploadSaga() {
-  yield all([
-    takeLatest(UPLOAD_IMAGE, uploadImage),
-  ])
+  yield takeLatest(UPLOAD_IMAGE, uploadImage);
 }

@@ -181,8 +181,6 @@ const Styled = {
 function ImageUpload() {
   const [nowPage, setNowPage] = useState('upload');
 
-  const [imgBase64, setImgBase64] = useState('');
-  const [imgFile, setImgFile] = useState(null);
   const [nowCount, setNowCount] = useState(1);
   const [readyToGame, setReadyToGame] = useState(false);
 
@@ -192,15 +190,8 @@ function ImageUpload() {
   const handleChangeFile = (e) => {
     const reader = new FileReader();
 
-    reader.onloadend = () => {
-      const base64 = reader.result;
-      if (base64) {
-        setImgBase64(base64.toString());
-      }
-    }
     if (e.target.files[0]) {
       reader.readAsDataURL(e.target.files[0]);
-      setImgFile(e.target.files[0]);
       onUploadImage(name, code, e.target.files[0]);
       setNowPage('auto');
     }
@@ -217,7 +208,6 @@ function ImageUpload() {
         setNowCount(nowCount + 1);
       }
     }
-    // onUploadImage(name, code, imgFile);
   }
 
   const handleClickChangePage = (menu) => {

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link, Redirect } from 'react-router-dom';
 import styled from 'styled-components';
-import io from 'socket.io-client';
 import useRoom from '../hooks/useRoom';
 
 import Stars from '../svgs/Stars.svg';
@@ -13,7 +12,6 @@ import { ReactComponent as Left } from '../svgs/left.svg';
 import { ReactComponent as Right } from '../svgs/right.svg';
 import { ReactComponent as Loading } from '../svgs/loading.svg';
 import { ReactComponent as Ready } from '../svgs/check.svg';
-
 
 const Styled = {
   Container: styled.div`
@@ -182,35 +180,9 @@ const Styled = {
   `,
 }
 
-const END_POINT = 'https://pictorial.ga';
-let socket;
-
 function Room() {
-  const [nowPage, setNowPage] = useState('room');
   const { code } = useParams();
-  const { name, connected, round, timeLimit, memberList, onSetRound, onSetTimeLimit, onSetMemberList } = useRoom();
-
-  useEffect(() => {
-    socket = io(`${END_POINT}/room`);
-    socket.emit('join', name, code);
-    socket.on('message', ({text}) => {
-      console.log(name);
-      console.log(text);
-    });
-    socket.on('userData', ({userList}) => {
-      console.log(userList);
-      // const list = userList.filter(user => user.name !== name);
-      onSetMemberList(userList);
-    });
-    socket.on('roomData', ({roomData}) => {
-      console.log(roomData);
-      onSetRound(roomData.round);
-      onSetTimeLimit(roomData.time);
-    });
-    return () => {
-      socket.off('')
-    }
-  }, [name, code, onSetMemberList, onSetRound, onSetTimeLimit]);
+  const { name, connected, round, timeLimit, memberList, onSetRound, onSetTimeLimit } = useRoom();
 
   const handleLinkShare = () => {
     const url = `https://pictorial.surge.sh/${code}`;
@@ -225,13 +197,13 @@ function Room() {
   const handleChangeRound = (e) => {
     const value = parseInt(e.target.value);
     onSetRound(value);
-    socket.emit('setRoom', code, value, timeLimit);
+    // socket.emit('setRoom', code, value, timeLimit);
   }
 
   const handleChangeTimeLimit = (e) => {
     const value = parseInt(e.target.value);
     onSetTimeLimit(value);
-    socket.emit('setRoom', code, round, value);
+    // socket.emit('setRoom', code, round, value);
   }
 
   const handleClickStart = () => {
@@ -239,96 +211,86 @@ function Room() {
   }
 
   return (
-    <>
-    {
-      nowPage === 'room' &&
-      <Styled.Container>
-        {
-          !connected &&
-          <Redirect to="/"></Redirect>
-        }
-        <Styled.LinkShareButton onClick={handleLinkShare} />
-        <Styled.Lobby>
-          <Styled.Name>{ name }</Styled.Name>
-          <Styled.CharacterSelectContainer>
-            {/* <Styled.SelectButton left>
-              <Left />
-            </Styled.SelectButton> */}
-            <Styled.AlienContainer>
-              <Styled.Alien alien={AlienL1} />
-            </Styled.AlienContainer>
-            {/* <Styled.SelectButton right>
-              <Right />
-            </Styled.SelectButton> */}
-          </Styled.CharacterSelectContainer>
-          <Styled.MiddleContainer>
-            <Link onClick={handleClickStart} to={`/room/${code}/upload`}>
-              <Styled.StartButton>
-                START
-              </Styled.StartButton>
-            </Link>
-            <Styled.OptionContainer>
-              <Styled.Option>
-                <Styled.ListCircle />
-                라운드 수
-                <Styled.Select value={round} onChange={handleChangeRound}>
-                  <option value={2} defaultValue>
-                    2
-                  </option>
-                  <option value={3}>
-                    3
-                  </option>
-                  <option value={5}>
-                    5
-                  </option>
-                </Styled.Select>
-              </Styled.Option>
-              <Styled.Option>
-                <Styled.ListCircle />
-                제한 시간
-                <Styled.Select value={timeLimit} onChange={handleChangeTimeLimit}>
-                  <option value={3} defaultValue>
-                    3s
-                  </option>
-                  <option value={5}>
-                    5s
-                  </option>
-                  <option value={10}>
-                    10s
-                  </option>
-                </Styled.Select>
-              </Styled.Option>
-            </Styled.OptionContainer>
-          </Styled.MiddleContainer>
-          <Styled.MemberListContainer>
-            { 
-              memberList.filter(member => member.name !== name).map((member) => (
-                <Styled.MemberContainer key={member.id}>
-                  <Styled.MemberAlienContainer>
-                    <Styled.MemberAlien alien={AlienL1} />
-                  </Styled.MemberAlienContainer>
-                  <Styled.MemberName>{ member.name }</Styled.MemberName>
-                  <Styled.MemberStatus>
+    <Styled.Container>
+      {
+        !connected &&
+        <Redirect to="/"></Redirect>
+      }
+      <Styled.LinkShareButton onClick={handleLinkShare} />
+      <Styled.Lobby>
+        <Styled.Name>{ name }</Styled.Name>
+        <Styled.CharacterSelectContainer>
+          {/* <Styled.SelectButton left>
+            <Left />
+          </Styled.SelectButton> */}
+          <Styled.AlienContainer>
+            <Styled.Alien alien={AlienL1} />
+          </Styled.AlienContainer>
+          {/* <Styled.SelectButton right>
+            <Right />
+          </Styled.SelectButton> */}
+        </Styled.CharacterSelectContainer>
+        <Styled.MiddleContainer>
+          <Link onClick={handleClickStart} to={`/room/${code}/upload`}>
+            <Styled.StartButton>
+              START
+            </Styled.StartButton>
+          </Link>
+          <Styled.OptionContainer>
+            <Styled.Option>
+              <Styled.ListCircle />
+              라운드 수
+              <Styled.Select value={round} onChange={handleChangeRound}>
+                <option value={2} defaultValue>
+                  2
+                </option>
+                <option value={3}>
+                  3
+                </option>
+                <option value={5}>
+                  5
+                </option>
+              </Styled.Select>
+            </Styled.Option>
+            <Styled.Option>
+              <Styled.ListCircle />
+              제한 시간
+              <Styled.Select value={timeLimit} onChange={handleChangeTimeLimit}>
+                <option value={3} defaultValue>
+                  3s
+                </option>
+                <option value={5}>
+                  5s
+                </option>
+                <option value={10}>
+                  10s
+                </option>
+              </Styled.Select>
+            </Styled.Option>
+          </Styled.OptionContainer>
+        </Styled.MiddleContainer>
+        <Styled.MemberListContainer>
+          { 
+            memberList.filter(member => member.name !== name).map((member) => (
+              <Styled.MemberContainer key={member.id}>
+                <Styled.MemberAlienContainer>
+                  <Styled.MemberAlien alien={AlienL1} />
+                </Styled.MemberAlienContainer>
+                <Styled.MemberName>{ member.name }</Styled.MemberName>
+                <Styled.MemberStatus>
+                  { 
+                    member.isReady ?
                     <Ready />
-                  </Styled.MemberStatus>
-                </Styled.MemberContainer>
-              ))
-            }
-          </Styled.MemberListContainer>
-        </Styled.Lobby>
-      </Styled.Container>
-    }
-
-    {/* {
-      nowPage === 'imageUpload' &&
-      <ImageUpload />
-    }
-    
-    {
-      nowPage === 'game' &&
-      <Game /> */}
-    }
-    </>
+                    :
+                    <Loading />
+                  }
+                </Styled.MemberStatus>
+              </Styled.MemberContainer>
+            ))
+          }
+        </Styled.MemberListContainer>
+      </Styled.Lobby>
+    </Styled.Container>
   )
 }
 

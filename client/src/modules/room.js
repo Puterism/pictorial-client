@@ -16,11 +16,15 @@ export const SET_CODE = 'room/SET_CODE';
 
 export const SET_ROUND = 'room/SET_ROUND';
 export const SET_TIME_LIMIT = 'room/SET_TIME_LIMIT';
+export const SET_ROOM_DATA = 'room/SET_ROOM_DATA';
+
 export const SET_MEMBER_LIST = 'room/SET_MEMBER_LIST';
 
 export const IMAGE_READY = 'room/IMAGE_READY';
 export const IMAGE_READY_SUCCESS = 'room/IMAGE_READY_SUCCESS';
 export const IMAGE_READY_FAILURE = 'room/IMAGE_READY_FAILURE';
+
+export const SET_GAME_READY = 'room/SET_GAME_READY';
 
 
 // action
@@ -74,6 +78,16 @@ export const checkRoomCode = (code) => ({
   payload: code,
 });
 
+export const checkRoomCodeSuccess = (response) => ({
+  type: CHECK_ROOM_CODE_SUCCESS,
+  payload: response,
+});
+
+export const checkRoomCodeFailure = (response) => ({
+  type: CHECK_ROOM_CODE_FAILURE,
+  payload: response,
+});
+
 export const setRound = (round) => ({
   type: SET_ROUND,
   payload: round,
@@ -82,6 +96,12 @@ export const setRound = (round) => ({
 export const setTimeLimit = (time) => ({
   type: SET_TIME_LIMIT,
   payload: time,
+});
+
+// setRound와 setTimeLimit가 성공했으면 setRoomData로 
+export const setRoomData = (response) => ({
+  type: SET_ROOM_DATA,
+  payload: response,
 });
 
 export const setMemberList = (list) => ({
@@ -104,6 +124,11 @@ export const imageReadyFailure = (response) => ({
   payload: response,
 });
 
+export const setGameReady = (response) => ({
+  type: SET_GAME_READY,
+  payload: response,
+});
+
 
 const initialState = {
   code: '',
@@ -113,6 +138,7 @@ const initialState = {
   connected: false,
   memberList: [],
   images: [],
+  gameReady: false,
 }
 
 // reducer
@@ -213,6 +239,12 @@ function room(state = initialState, { type, payload }) {
         ...state,
         memberList: payload,
       }
+    
+    case SET_ROOM_DATA:
+      return {
+        ...state,
+        ...payload,
+      }
 
     case IMAGE_READY:
       return {
@@ -230,6 +262,12 @@ function room(state = initialState, { type, payload }) {
         ...state,
         images: [],
         showError: true,
+      }
+    
+    case SET_GAME_READY:
+      return {
+        ...state,
+        gameReady: true,
       }
 
     default:

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 import useRoom from '../hooks/useRoom';
-import io from 'socket.io-client';
 
 import Stars from '../svgs/Stars.svg';
 import FindingMark from '../svgs/finding-mark.svg';
@@ -154,23 +153,10 @@ const Styled = {
   `,
 }
 
-const END_POINT = 'https://pictorial.ga';
-let socket;
-
 function Game() {
   const { name, code, connected, memberList, onSetMemberList, round, timeLimit, onImageReady, images } = useRoom();
   const [nowRound, setNowRound] = useState(1);
   const [nowTime, setNowTime] = useState(timeLimit);
-
-  useEffect(() => {
-    socket = io(`${END_POINT}/room`);
-    socket.emit('ready', name, code);
-    // console.log(name, code);
-    // socket.on('readyUserData', ({userData}) => {
-    //   console.log(userData);
-    //   onSetMemberList(userData);
-    // })
-  }, [name, code]);
 
   useEffect(() => {
     if (!nowTime) return;

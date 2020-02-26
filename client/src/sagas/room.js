@@ -1,146 +1,181 @@
-import { takeLatest, all, call, put } from 'redux-saga/effects';
-// import { eventChannel } from 'redux-saga';
+import { takeLatest, take, fork, call, put, apply, select } from 'redux-saga/effects';
+import { eventChannel } from 'redux-saga';
 import {
-  FETCH_ROOM_CODE, FETCH_ROOM_CODE_SUCCESS, FETCH_ROOM_CODE_FAILURE, 
-  CONNECT_ROOM, CONNECT_ROOM_SUCCESS, CONNECT_ROOM_FAILURE,
-  CHECK_ROOM_CODE, CHECK_ROOM_CODE_SUCCESS, CHECK_ROOM_CODE_FAILURE,
-  IMAGE_READY, IMAGE_READY_SUCCESS, IMAGE_READY_FAILURE
+  FETCH_ROOM_CODE, CONNECT_ROOM, CHECK_ROOM_CODE, IMAGE_READY, 
+  SET_ROUND, SET_TIME_LIMIT,
+  fetchRoomCodeSuccess, fetchRoomCodeFailure,
+  connectRoomSuccess, connectRoomFailure,
+  checkRoomCodeSuccess, checkRoomCodeFailure,
+  imageReadySuccess, imageReadyFailure,
+  setMemberList, setRoomData,
 } from '../modules/room';
 import { push } from 'connected-react-router';
 import { createRoom, checkRoomCode, connectRoom, imageReady } from '../apis';
-// import io from 'socket.io-client';
+import socketConnection from '../libs/socketConnection';
 
-// function connect() {
-//   const socket = io('http://pictorial.puterism.com/room');
-//   return new Promise(resolve => {
-//     socket.on('connect', () => {
-//       resolve(socket);
-//     });
-//   });
-// }
+function subscribe(socket, eventType) {
+  return eventChannel(emit => {
+    // const emitter = message => emit(message);
 
-// function subscribe(socket) {
-//   return eventChannel(emit => {
-//     socket.on('message', ({ text }) => {
-//       console.log(text);
-//     });
+    // socket.on(eventType, emitter);
+    // return function unsubscribe() {
+    //   socket.off(eventType, emitter);
+    // }
 
-//     return function unsubscribe() {
-//       socket.off();
-//     }
-//   })
-// }
+    socket.on('message', ({ text }) => {
+      console.log(text);
+    });
 
-// function* read(socket) {
-//   const channel = yield call(subscribe, socket);
-//   while (true) {
-//     const action = yield take(channel);
-//     yield put(action);
-//   }
-// }
+    socket.on('userData', ({ userList }) => {
+      console.log(userList);
+      emit(setMemberList(userList));
+    });
 
-// function* write(socket) {
-//   while (true) {
-//     const { payload } = yield take(`${sendMessage}`);
-//     socket.emit('message', payload);
-//   }
-// }
+    socket.on('roomData', ({ roomData }) => {
+      console.log(roomData);
+      
+      emit(setRoomData({ round: roomData.round, timeLimit: roomData.time }));
+    });
 
-// function* handleIO(socket) {
-//   yield fork(read, socket);
-//   // yield fork(write, socket);
-// }
+    socket.on('readyUserData', ({ userList }) => {
+      console.log(userList);
 
-function* fetchRoomCodeSaga(action) {
-  const { payload } = action;
-  if (!payload) return;
+      emit(setMemberList(userList));
+    })
 
-  try {
-    const response = yield call(createRoom, payload);
-    yield put({ type: FETCH_ROOM_CODE_SUCCESS, payload: { ...response, ...payload }});
-    yield put(push(`/room/${response.data.roomCode}`, { code: response.data.roomCode }));
-    // yield take(CONNECT_ROOM, connectRoomSaga);
-  } catch (error) {
-    yield put({ type: FETCH_ROOM_CODE_FAILURE, payload: error });
+    return function unsubscribe() {
+      socket.off('message');
+      socket.off('userData');
+      socket.off('roomData');
+      socket.off('readyUserData');
+    }
+  });
+}
+
+
+function* read(socket, type) {
+  const channel = yield call(subscribe, socket, type);
+  while (true) {
+    let action = yield take(channel);
+    yield put(action);
   }
 }
 
-function* checkRoomCodeSaga(action) {
-  const { payload } = action;
-  if (!payload) return;
-
-  try {
-    const response = yield call(checkRoomCode, payload);
-    yield put({ type: CHECK_ROOM_CODE_SUCCESS, payload: { ...response, ...payload }});
-    // yield put(push(`/room/${payload.code}`, { code: payload.code }));
-  } catch (error) {
-    yield put({ type: CHECK_ROOM_CODE_FAILURE, payload: error });
-    yield put(push(`/`));
+function* setRoundSaga(socket) {
+  while (true) {
+    const { payload } = yield take(SET_ROUND);
+    const code = yield select(state => state.room.code);
+    const time = yield select(state => state.room.timeLimit);
+  
+    yield apply(socket, socket.emit, ['setRoom', code, payload, time]);
   }
 }
 
-function* connectRoomSaga(action) {
-  const { payload } = action;
-  if (!payload) return;
+function* setTimeLimitSaga(socket) {
+  while (true) {
+    const { payload } = yield take(SET_TIME_LIMIT);
+    const code = yield select(state => state.room.code);
+    const round = yield select(state => state.room.round);
 
-  try {
-    const response = yield call(connectRoom, payload);
-    yield put({ type: CONNECT_ROOM_SUCCESS, payload: { ...response, ...payload }});
-    yield put(push(`/room/${payload.code}`, { name: payload.name, code: payload.code }));
-  } catch (error) {
-    yield put({ type: CONNECT_ROOM_FAILURE, payload: { ...error }});
+    yield apply(socket, socket.emit, ['setRoom', code, round, payload]);
   }
 }
 
-function* imageReadySaga(action) {
-  const { payload } = action;
-  if (!payload) return;
+function* handleSocket(socket) {
+  yield fork(read, socket);
 
-  try {
-    const response = yield call(imageReady, payload);
-    yield put({ type: IMAGE_READY_SUCCESS, payload: { ...response }});
-  } catch (error) {
-    yield put({ type: IMAGE_READY_FAILURE, payload: { ...error }});
+  yield fork(setRoundSaga, socket);
+  yield fork(setTimeLimitSaga, socket);
+}
+
+function* fetchRoomCodeSaga() {
+  // const { payload } = action;
+  // if (!payload) return;
+
+  while (true) {
+    try {
+      const actions = yield take(FETCH_ROOM_CODE);
+      const payload = actions.payload;
+
+      const response = yield call(createRoom, payload);
+      const socket = yield call(socketConnection);
+
+      yield fork(handleSocket, socket);
+      yield apply(socket, socket.emit, ['join', payload.name, response.data.roomCode]);
+      
+      yield put(fetchRoomCodeSuccess({ ...response, ...payload }));
+      yield put(push(`/room/${response.data.roomCode}`, { code: response.data.roomCode }));
+    } catch (error) {
+      yield put(fetchRoomCodeFailure(error));
+    }
+  }
+  
+}
+
+function* checkRoomCodeSaga() {
+  // const { payload } = action;
+  // if (!payload) return;
+
+  while (true) {
+    try {
+      const actions = yield take(CHECK_ROOM_CODE);
+      const payload = actions.payload;
+
+      const response = yield call(checkRoomCode, payload);
+      yield put(checkRoomCodeSuccess({ ...response, ...payload }));
+    } catch (error) {
+      yield put(checkRoomCodeFailure(error));
+    }
   }
 }
 
-// function* connectRoomSaga(action) {
-//   const { payload } = action;
-//   if (!payload) return;
 
-//   try {
-//     // const socket = yield call(connect);
-//     // const task = yield fork(handleIO, socket);
-//     // socket.emit('join', payload.name, payload.code);
+function* connectRoomSaga() {
+  // const { payload } = action;
+  // if (!payload) return;
 
-//     yield put({ type: CONNECT_ROOM_SUCCESS, payload: { ...payload }});
-//     yield put(push(`/room/${payload.code}`, { name: payload.name, code: payload.code }));
-//   } catch (error) {
-//     yield put({ type: CONNECT_ROOM_FAILURE, payload: {  ...error }});
-//   }
-// }
+  while (true) {
+    try {
+      const { payload } = yield take(CONNECT_ROOM);
+      
+      const response = yield call(connectRoom, payload);
+      const socket = yield call(socketConnection);
 
-// function* flow() {
-//   while (true) {
-//     try {
-//       let { payload } = yield take(CONNECT_ROOM);
-//       const socket = yield call(connect);
-//       socket.emit('join', payload.name, payload.code);
-//       const task = yield fork(handleIO, socket);
-//       yield put({ type: CONNECT_ROOM_SUCCESS, payload: { ...payload }});
-//     } catch (error) {
-//       yield put({ type: CONNECT_ROOM_FAILURE, payload: {  ...error }});
-//     }
-//   }
-// }
+      yield fork(handleSocket, socket);
+      yield apply(socket, socket.emit, ['join', payload.name, payload.code]); 
+  
+      yield put(connectRoomSuccess({ ...response, ...payload }));
+      yield put(push(`/room/${payload.code}`, { name: payload.name, code: payload.code }));
+  
+    } catch (error) {
+      yield put(connectRoomFailure({ ...error }));
+      yield put(push(`/`));
+    }
+  }
+}
+
+function* imageReadySaga() {
+  // const { payload } = action;
+  // if (!payload) return;
+
+  while (true) {
+    try {
+      const { payload } = yield take(IMAGE_READY);
+
+      const response = yield call(imageReady, payload);
+      yield put(imageReadySuccess({ ...response }));
+    } catch (error) {
+      yield put(imageReadyFailure({ ...error }));
+    }
+  }
+}
 
 export default function* roomSaga() {
-  yield all([
-    takeLatest(FETCH_ROOM_CODE, fetchRoomCodeSaga),
-    takeLatest(CONNECT_ROOM, connectRoomSaga),
-    takeLatest(CHECK_ROOM_CODE, checkRoomCodeSaga),
-    takeLatest(IMAGE_READY, imageReadySaga),
-    // takeLatest(JOIN_ROOM_WITH_NAME_SAVE, joinRoomWithNameSaveSaga),
-    // fork(flow),
-  ])
+  yield takeLatest(IMAGE_READY, imageReadySaga);
+
+  yield fork(fetchRoomCodeSaga);
+  yield fork(connectRoomSaga);
+  yield fork(checkRoomCodeSaga);
+  // yield fork(imageReadySaga);
+
 }
