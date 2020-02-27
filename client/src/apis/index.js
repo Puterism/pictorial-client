@@ -7,17 +7,16 @@ export async function createRoom(payload) {
     const response = await axios.post(`${END_POINT}/create`, payload);
     return response;
   } catch (error) {
-    return error;
+    throw error;
   }
 }
 
 export async function checkRoomCode(payload) {
-  console.log(payload);
   try {
     const response = await axios.post(`${END_POINT}/invite`, { roomCode: payload });
     return response;
   } catch (error) {
-    return error;
+    throw error;
   }
 }
 
@@ -26,7 +25,7 @@ export async function connectRoom(payload) {
     const response = await axios.post(`${END_POINT}/joinRoom`, { name: payload.name, roomCode: payload.code });
     return response;
   } catch (error) {
-    return error;
+    throw error;
   }
 }
 
@@ -45,15 +44,25 @@ export async function imageUpload(payload) {
     });
     return response;
   } catch (error) {
-    return error;
+    throw error;
   }
 }
 
-export async function imageReady(payload) {
+export async function imageReady(code) {
   try {
-    const response = await axios.get(`${END_POINT}/image/ready`, { code: payload.code });
+    const response = await axios.get(`${END_POINT}/images/ready?code=${code}`);
+
+    // const response = await axios({
+    //   method: 'get',
+    //   url: `${END_POINT}/images/ready`,
+    //   query: {
+    //     code
+    //   },
+    // });
+    console.log({ code });
     return response;
   } catch (error) {
-    return error;
+    console.error(error);
+    throw error;
   }
 }

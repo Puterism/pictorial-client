@@ -21,7 +21,6 @@ const Styled = {
   `,
   GameContainer: styled.div`
     width: 80%;
-    min-width: 1000px;
     margin: 0 auto;
   `,
   Header: styled.div`
@@ -49,20 +48,26 @@ const Styled = {
     color: #ffffff;
   `,
   ContentContainer: styled.div`
-    display: flex;
+    /* display: flex;
     justify-content: space-between;
-    align-items: top;
+    align-items: top; */
+    min-width: 1210px;
+    height: 620px;
+    text-align: center;
   `,
-  MemberList: styled.div`
-    flex: 1;
+  UserList: styled.div`
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
   `,
-  MemberStat: styled.div`
+  UserStat: styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: left;
+    text-align: left;
   `,
-  MemberAlien: styled.div`
+  UserAlien: styled.div`
     background-image: ${props => `url(${props.alien})`};
     background-size: 100% 100%;
     background-position: center;
@@ -70,26 +75,26 @@ const Styled = {
     height: 83px;
     margin-right: 14px;
   `,
-  MemberProfile: styled.div`
+  UserProfile: styled.div`
     display: flex;
     justify-content: left;
     flex-direction: column;
     margin-right: 25px;
     width: 200px;
   `,
-  MemberName: styled.h3`
+  UserName: styled.h3`
     font-size: 20px;
     color: #c4c4c4;
     margin: 0;
   `,
-  MemberScore: styled.h3`
+  UserScore: styled.h3`
     font-size: 48px;
     font-weight: 300;
     letter-spacing: 6.24px;
     color: #ffffff;
     margin: 0;
   `,
-  MemberStatus: styled.div`
+  UserStatus: styled.div`
     width: 81px;
     height: 32px;
     background-image: ${props => {
@@ -101,7 +106,7 @@ const Styled = {
     background-repeat: no-repeat;
   `,
   Game: styled.div`
-    flex: 2;
+    display: inline-block;
   `,
   ImageBox: styled.div`
     width: 800px;
@@ -122,6 +127,7 @@ const Styled = {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    box-sizing: border-box;
   `,
 
   TimerContainer: styled.div`
@@ -154,9 +160,13 @@ const Styled = {
 }
 
 function Game() {
-  const { name, code, connected, memberList, onSetMemberList, round, timeLimit, onImageReady, images } = useRoom();
-  const [nowRound, setNowRound] = useState(1);
+  const { name, code, connected, userList, onSetUserList, round, timeLimit, onSetGameReady, onImageReady, images } = useRoom();
+  const [nowRound, setNowRound] = useState(0);
   const [nowTime, setNowTime] = useState(timeLimit);
+
+  useEffect(() => {
+    onSetGameReady(code);
+  }, [onSetGameReady]);
 
   useEffect(() => {
     if (!nowTime) return;
@@ -176,9 +186,12 @@ function Game() {
       }
       <Styled.GameContainer>
         <Styled.Header>
-          <Styled.Round>
-            { nowRound } / { round } ROUND
-          </Styled.Round>
+          { 
+            nowRound > 0 &&
+            <Styled.Round>
+              { nowRound } / { round } ROUND
+            </Styled.Round>
+          }
           <Styled.Keyword>
             플레이어를 기다리는 중...
           </Styled.Keyword>
@@ -187,20 +200,29 @@ function Game() {
           </Styled.Author>
         </Styled.Header>
         <Styled.ContentContainer>
-          <Styled.MemberList>
+          <Styled.UserList>
+            
+            <Styled.UserStat>
+              <Styled.UserAlien alien={Alien6} />
+              <Styled.UserProfile>
+                <Styled.UserName>KkiYubb</Styled.UserName>
+                <Styled.UserScore>3010</Styled.UserScore>
+              </Styled.UserProfile>
+              <Styled.UserStatus owner />
+            </Styled.UserStat>
             {
-              memberList.map((member) => (
-                <Styled.MemberStat key={member.id}>
-                  <Styled.MemberAlien alien={Alien6} />
-                  <Styled.MemberProfile>
-                    <Styled.MemberName>{member.name}</Styled.MemberName>
-                    <Styled.MemberScore>{member.score}</Styled.MemberScore>
-                  </Styled.MemberProfile>
-                  <Styled.MemberStatus finding />
-                </Styled.MemberStat>
+              userList.map((user) => (
+                <Styled.UserStat key={user.id}>
+                  <Styled.UserAlien alien={Alien6} />
+                  <Styled.UserProfile>
+                    <Styled.UserName>{user.name}</Styled.UserName>
+                    <Styled.UserScore>{user.score}</Styled.UserScore>
+                  </Styled.UserProfile>
+                  <Styled.UserStatus finding />
+                </Styled.UserStat>
               ))
             }
-          </Styled.MemberList>
+          </Styled.UserList>
 
           <Styled.Game>
             <Styled.ImageBox>

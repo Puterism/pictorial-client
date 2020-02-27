@@ -123,14 +123,14 @@ const Styled = {
     padding: 6px 16px;
     margin-left: 24px;
   `,
-  MemberListContainer: styled.div`
+  UserListContainer: styled.div`
     margin-top: 61px;
     display: flex;
     justify-content: left;
     align-items: center;
     flex-direction: left;
   `,
-  MemberContainer: styled.div`
+  UserContainer: styled.div`
     width: 140px;
     display: flex;
     justify-content: center;
@@ -138,7 +138,7 @@ const Styled = {
     flex-direction: column;
     margin: 0 17px;
   `,
-  MemberAlienContainer: styled.div`
+  UserAlienContainer: styled.div`
     width: 140px;
     height: 140px;
     background-image: url(${SmallCircle});
@@ -148,19 +148,19 @@ const Styled = {
     justify-content: center;
     align-items: center;
   `,
-  MemberAlien: styled.div`
+  UserAlien: styled.div`
     width: 114px;
     height: 114px;
     background-image: url(${props => props.alien});
     background-size: 100% 100%;
     background-position: center;
   `,
-  MemberName: styled.h3`
+  UserName: styled.h3`
     font-size: 30px;
     color: #ffffff;
     margin: 28px 0 6px 0;
   `,
-  MemberStatus: styled.div`
+  UserStatus: styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -182,7 +182,7 @@ const Styled = {
 
 function Room() {
   const { code } = useParams();
-  const { name, connected, round, timeLimit, memberList, onSetRound, onSetTimeLimit } = useRoom();
+  const { name, connected, round, timeLimit, userList, onSetRound, onSetTimeLimit, onSetGameStart } = useRoom();
 
   const handleLinkShare = () => {
     const url = `https://pictorial.surge.sh/${code}`;
@@ -197,17 +197,15 @@ function Room() {
   const handleChangeRound = (e) => {
     const value = parseInt(e.target.value);
     onSetRound(value);
-    // socket.emit('setRoom', code, value, timeLimit);
   }
 
   const handleChangeTimeLimit = (e) => {
     const value = parseInt(e.target.value);
     onSetTimeLimit(value);
-    // socket.emit('setRoom', code, round, value);
   }
 
   const handleClickStart = () => {
-
+    onSetGameStart(true);
   }
 
   return (
@@ -231,11 +229,9 @@ function Room() {
           </Styled.SelectButton> */}
         </Styled.CharacterSelectContainer>
         <Styled.MiddleContainer>
-          <Link onClick={handleClickStart} to={`/room/${code}/upload`}>
-            <Styled.StartButton>
-              START
-            </Styled.StartButton>
-          </Link>
+          <Styled.StartButton onClick={handleClickStart}>
+            START
+          </Styled.StartButton>
           <Styled.OptionContainer>
             <Styled.Option>
               <Styled.ListCircle />
@@ -269,26 +265,26 @@ function Room() {
             </Styled.Option>
           </Styled.OptionContainer>
         </Styled.MiddleContainer>
-        <Styled.MemberListContainer>
+        <Styled.UserListContainer>
           { 
-            memberList.filter(member => member.name !== name).map((member) => (
-              <Styled.MemberContainer key={member.id}>
-                <Styled.MemberAlienContainer>
-                  <Styled.MemberAlien alien={AlienL1} />
-                </Styled.MemberAlienContainer>
-                <Styled.MemberName>{ member.name }</Styled.MemberName>
-                <Styled.MemberStatus>
+            userList.filter(user => user.name !== name).map((user) => (
+              <Styled.UserContainer key={user.id}>
+                <Styled.UserAlienContainer>
+                  <Styled.UserAlien alien={AlienL1} />
+                </Styled.UserAlienContainer>
+                <Styled.UserName>{ user.name }</Styled.UserName>
+                <Styled.UserStatus>
                   { 
-                    member.isReady ?
+                    user.isReady ?
                     <Ready />
                     :
                     <Loading />
                   }
-                </Styled.MemberStatus>
-              </Styled.MemberContainer>
+                </Styled.UserStatus>
+              </Styled.UserContainer>
             ))
           }
-        </Styled.MemberListContainer>
+        </Styled.UserListContainer>
       </Styled.Lobby>
     </Styled.Container>
   )

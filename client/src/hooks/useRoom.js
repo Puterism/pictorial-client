@@ -1,6 +1,10 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useCallback } from 'react';
-import { fetchRoomCode, connectRoom, setName, setCode, checkRoomCode, setRound, setTimeLimit, setMemberList, imageReady } from '../modules/room'
+import { fetchRoomCode, connectRoom, checkRoomCode,
+  setName, setCode, setErrorMessage,
+  setRound, setTimeLimit, setUserList,
+  imageReady, setGameReady, setGameStart,
+} from '../modules/room'
 
 export default function useRoom() {
   const name = useSelector((state) => state.room.name);
@@ -8,8 +12,8 @@ export default function useRoom() {
   const round = useSelector((state) => state.room.round);
   const timeLimit = useSelector((state) => state.room.timeLimit);
   const connected = useSelector((state) => state.room.connected);
-  const errorMsg = useSelector((state) => state.room.errorMsg);
-  const memberList = useSelector((state) => state.room.memberList);
+  const errorMessage = useSelector((state) => state.room.errorMessage);
+  const userList = useSelector((state) => state.room.userList);
   const images = useSelector((state) => state.room.images);
   
   const dispatch = useDispatch();
@@ -33,6 +37,11 @@ export default function useRoom() {
     (code) => dispatch(setCode(code)),
     [dispatch]
   );
+  
+  const onSetErrorMessage = useCallback(
+    (message) => dispatch(setErrorMessage(message)),
+    [dispatch]
+  );
 
   const onCheckRoomCode = useCallback(
     (code) => dispatch(checkRoomCode(code)),
@@ -49,8 +58,18 @@ export default function useRoom() {
     [dispatch]
   );
 
-  const onSetMemberList = useCallback(
-    (list) => dispatch(setMemberList(list)),
+  const onSetUserList = useCallback(
+    (list) => dispatch(setUserList(list)),
+    [dispatch]
+  );
+
+  const onSetGameReady = useCallback(
+    () => dispatch(setGameReady()),
+    [dispatch]
+  );
+
+  const onSetGameStart = useCallback(
+    (status) => dispatch(setGameStart(status)),
     [dispatch]
   );
 
@@ -60,10 +79,11 @@ export default function useRoom() {
   );
 
   return {
-    name, code, errorMsg, round, timeLimit, connected, memberList, images,
+    name, code, errorMessage, round, timeLimit, connected, userList, images,
     onFetchRoomID,
     onConnectRoom,
     onSetName, onSetCode, onSetRound, onSetTimeLimit,
-    onCheckRoomCode, onSetMemberList, onImageReady
+    onCheckRoomCode, onSetUserList, onImageReady,
+    onSetErrorMessage, onSetGameReady, onSetGameStart,
   };
 }

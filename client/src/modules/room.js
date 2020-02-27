@@ -13,18 +13,22 @@ export const CHECK_ROOM_CODE_FAILURE = 'room/CHECK_ROOM_CODE_FAILURE';
 
 export const SET_NAME = 'room/SET_NAME';
 export const SET_CODE = 'room/SET_CODE';
+export const SET_ERROR_MESSAGE = 'room/SET_ERROR_MESSAGE';
 
 export const SET_ROUND = 'room/SET_ROUND';
 export const SET_TIME_LIMIT = 'room/SET_TIME_LIMIT';
 export const SET_ROOM_DATA = 'room/SET_ROOM_DATA';
 
-export const SET_MEMBER_LIST = 'room/SET_MEMBER_LIST';
+export const SET_USER_LIST = 'room/SET_USER_LIST';
 
 export const IMAGE_READY = 'room/IMAGE_READY';
 export const IMAGE_READY_SUCCESS = 'room/IMAGE_READY_SUCCESS';
 export const IMAGE_READY_FAILURE = 'room/IMAGE_READY_FAILURE';
 
 export const SET_GAME_READY = 'room/SET_GAME_READY';
+
+export const SET_GAME_START = 'room/SET_GAME_START';
+export const SET_GAME_START_SUCCESS = 'room/SET_GAME_START_SUCCESS';
 
 
 // action
@@ -40,10 +44,12 @@ export const fetchRoomCodeSuccess = (response) => ({
   payload: response,
 });
 
-export const fetchRoomCodeFailure = (response) => ({
+export const fetchRoomCodeFailure = (error) => ({
   type: FETCH_ROOM_CODE_FAILURE,
-  payload: response,
+  payload: error,
 });
+
+
 
 export const connectRoom = (name, code) => ({
   type: CONNECT_ROOM,
@@ -58,10 +64,12 @@ export const connectRoomSuccess = (response) => ({
   payload: response,
 });
 
-export const connectRoomFailure = (response) => ({
+export const connectRoomFailure = (error) => ({
   type: CONNECT_ROOM_FAILURE,
-  payload: response,
+  payload: error,
 });
+
+
 
 export const setName = (name) => ({
   type: SET_NAME,
@@ -73,6 +81,13 @@ export const setCode = (code) => ({
   payload: code,
 });
 
+export const setErrorMessage = (message) => ({
+  type: SET_ERROR_MESSAGE,
+  payload: message,
+});
+
+
+
 export const checkRoomCode = (code) => ({
   type: CHECK_ROOM_CODE,
   payload: code,
@@ -83,9 +98,9 @@ export const checkRoomCodeSuccess = (response) => ({
   payload: response,
 });
 
-export const checkRoomCodeFailure = (response) => ({
+export const checkRoomCodeFailure = (error) => ({
   type: CHECK_ROOM_CODE_FAILURE,
-  payload: response,
+  payload: error,
 });
 
 export const setRound = (round) => ({
@@ -104,8 +119,8 @@ export const setRoomData = (response) => ({
   payload: response,
 });
 
-export const setMemberList = (list) => ({
-  type: SET_MEMBER_LIST,
+export const setUserList = (list) => ({
+  type: SET_USER_LIST,
   payload: list,
 });
 
@@ -119,15 +134,24 @@ export const imageReadySuccess = (response) => ({
   payload: response,
 });
 
-export const imageReadyFailure = (response) => ({
+export const imageReadyFailure = (error) => ({
   type: IMAGE_READY_FAILURE,
-  payload: response,
+  payload: error,
 });
 
-export const setGameReady = (response) => ({
-  type: SET_GAME_READY,
-  payload: response,
+export const setGameStart = (status) => ({
+  type: SET_GAME_START,
+  payload: status,
 });
+
+export const setGameStartSuccess = () => ({
+  type: SET_GAME_START_SUCCESS,
+});
+
+export const setGameReady = () => ({
+  type: SET_GAME_READY,
+});
+
 
 
 const initialState = {
@@ -136,7 +160,7 @@ const initialState = {
   round: 2,
   timeLimit: 3,
   connected: false,
-  memberList: [],
+  userList: [],
   images: [],
   gameReady: false,
 }
@@ -184,7 +208,7 @@ function room(state = initialState, { type, payload }) {
       return {
         ...state,
         ...payload,
-        errorMsg: payload.response.data.message,
+        errorMessage: payload.response.data.message,
         connected: false,
         showError: true,
       };
@@ -200,6 +224,12 @@ function room(state = initialState, { type, payload }) {
         ...state,
         code: payload.code,
       };
+
+    case SET_ERROR_MESSAGE:
+      return {
+        ...state,
+        errorMessage: payload,
+      }
 
     case CHECK_ROOM_CODE:
       return {
@@ -217,7 +247,7 @@ function room(state = initialState, { type, payload }) {
       return {
         ...state,
         ...payload,
-        errorMsg: payload.response.data.message,
+        errorMessage: payload.response.data.message,
         connected: false,
         showError: true,
       };
@@ -234,16 +264,32 @@ function room(state = initialState, { type, payload }) {
         timeLimit: payload,
       };
 
-    case SET_MEMBER_LIST:
+    case SET_USER_LIST:
       return {
         ...state,
-        memberList: payload,
+        userList: payload,
       }
     
     case SET_ROOM_DATA:
       return {
         ...state,
         ...payload,
+      }
+    
+    case SET_GAME_READY:
+      return {
+        ...state,
+        gameReady: true,
+      }
+
+    case SET_GAME_START:
+      return {
+        ...state,
+      }
+
+    case SET_GAME_START_SUCCESS:
+      return {
+        ...state,
       }
 
     case IMAGE_READY:
@@ -254,7 +300,7 @@ function room(state = initialState, { type, payload }) {
     case IMAGE_READY_SUCCESS:
       return {
         ...state,
-        images: payload,
+        images: payload.data.answerList,
       }
     
     case IMAGE_READY_FAILURE:
@@ -262,12 +308,6 @@ function room(state = initialState, { type, payload }) {
         ...state,
         images: [],
         showError: true,
-      }
-    
-    case SET_GAME_READY:
-      return {
-        ...state,
-        gameReady: true,
       }
 
     default:
