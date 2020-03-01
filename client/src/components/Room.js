@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link, Redirect } from 'react-router-dom';
+import { useParams, Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 import useRoom from '../hooks/useRoom';
 

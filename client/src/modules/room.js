@@ -39,6 +39,7 @@ export const SET_NOW_TIME = 'room/SET_NOW_TIME';
 export const SET_GAME_IN_PROGRESS = 'room/SET_GAME_IN_PROGRESS';
 
 export const SET_NOW_ROUND = 'room/SET_NOW_ROUND';
+export const SET_NEXT_ROUND = 'room/SET_NEXT_ROUND';
 export const SET_SHOW_IMAGE = 'room/SET_SHOW_IMAGE';
 
 export const CLICKED_WRONG = 'room/CLICKED_WRONG';
@@ -195,6 +196,10 @@ export const setNowRound = (round) => ({
   payload: round,
 });
 
+export const setNextRound = () => ({
+  type: SET_NEXT_ROUND,
+})
+
 export const setShowImage = (status) => ({
   type: SET_SHOW_IMAGE,
   payload: status,
@@ -202,11 +207,12 @@ export const setShowImage = (status) => ({
 
 export const clickedWrong = (time) => ({
   type: CLICKED_WRONG,
-
+  payload: time,
 });
 
 export const clickedAnswer = (time) => ({
   type: CLICKED_ANSWER,
+  payload: time,
 });
 
 
@@ -224,6 +230,7 @@ const initialState = {
   inProgress: false,
   nowRound: null,
   showImage: false,
+  showAnswer: false,
 }
 
 // reducer
@@ -405,6 +412,14 @@ function room(state = initialState, { type, payload }) {
         nowRound: payload,
       }
 
+    case SET_NEXT_ROUND:
+      return {
+        ...state,
+        showImage: false,
+        showAnswer: false,
+        countdown: 3,
+      }
+
     case SET_SHOW_IMAGE:
       return {
         ...state,
@@ -419,6 +434,7 @@ function room(state = initialState, { type, payload }) {
     case CLICKED_ANSWER:
       return {
         ...state,
+        showAnswer: true,
       }
 
     default:

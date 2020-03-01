@@ -22,6 +22,7 @@ export default function useRoom() {
   const timer = useSelector((state) => state.room.timer);
   const nowRound = useSelector((state) => state.room.nowRound);
   const showImage = useSelector((state) => state.room.showImage);
+  const showAnswer = useSelector((state) => state.room.showAnswer);
   
   const dispatch = useDispatch();
 
@@ -96,18 +97,18 @@ export default function useRoom() {
   );
 
   const onClickedWrong = useCallback(
-    () => dispatch(clickedWrong()),
+    (time) => dispatch(clickedWrong(time)),
     [dispatch]
   );
 
   const onClickedAnswer = useCallback(
-    () => dispatch(clickedAnswer()),
+    (time) => dispatch(clickedAnswer(time)),
     [dispatch]
   );
 
   return {
     name, code, profile, errorMessage, round, timeLimit, connected, userList, 
-    images, inProgress, countdown, timer, nowRound, showImage,
+    images, inProgress, countdown, timer, nowRound, showImage, showAnswer,
     onFetchRoomID, onConnectRoom, 
     onSetName, onSetCode, onSetProfile, onSetRound, onSetTimeLimit,
     onCheckRoomCode, onSetUserList, onImageReady,

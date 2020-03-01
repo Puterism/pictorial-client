@@ -1,17 +1,19 @@
-import { takeLatest, takeEvery, take, fork, call, put, apply, select } from 'redux-saga/effects';
+import { takeLatest, take, fork, call, put, apply, select } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import {
   FETCH_ROOM_CODE, CONNECT_ROOM, CHECK_ROOM_CODE, IMAGE_READY, 
-  SET_ROUND, SET_TIME_LIMIT, SET_PROFILE, 
+  SET_ROUND, SET_TIME_LIMIT, SET_PROFILE, SET_NOW_ROUND, SET_NEXT_ROUND,
   SET_GAME_READY, SET_GAME_START, SET_GAME_START_SUCCESS,
   SET_GAME_IMAGE_DOWNLOADED, SET_GAME_IN_PROGRESS, SET_NOW_COUNTDOWN_TIME,
+  CLICKED_WRONG, CLICKED_ANSWER,
   fetchRoomCodeSuccess, fetchRoomCodeFailure,
   connectRoomSuccess, connectRoomFailure,
   checkRoomCodeSuccess, checkRoomCodeFailure,
   imageReady, imageReadySuccess, imageReadyFailure, 
   setUserList, setRoomData, setGameStartSuccess,
-  setGameImageDownloaded, setGameInProgress, setNowCountdownTime,
-  setNowRound, setShowImage, CLICKED_WRONG, CLICKED_ANSWER,
+  setGameImageDownloaded, setGameInProgress,
+  setNowCountdownTime, setNowTime,
+  setNowRound, setNextRound, setShowImage, 
 } from '../modules/room';
 import { push } from 'connected-react-router';
 import { createRoom, checkRoomCode, connectRoom, imageReadyRequest } from '../apis';
@@ -40,10 +42,12 @@ function subscribe(socket, eventType) {
       emit(setRoomData({ round: roomData.round, timeLimit: roomData.time }));
     });
 
+    // 게임 시작 버튼을 누군가 눌러 이미지 업로드 화면으로 다 같이 전환
     socket.on('gameStart', () => {
       emit(setGameStartSuccess());
     });
 
+    // 이미지 업로드가 다 되어 준비가 완료된 유저 데이터
     socket.on('readyUserData', ({ userList }) => {
       emit(setUserList(userList));
     });
@@ -55,18 +59,27 @@ function subscribe(socket, eventType) {
 
     // 모든 유저가 게임에 사용될 이미지 다운로드를 마친 상태
     socket.on('allUserDownload', () => {
-      console.log('allUserDownload');
       emit(setGameInProgress(true));
     });
 
+    // 이미지 문제 표시 전 카운트다운
     socket.on('countdown', ({ time }) => {
       emit(setNowCountdownTime(time));
     });
 
+    // 문제를 맞추어야 하는 제한 시간
     socket.on('timer', ({ time }) => {
-      console.log(time);
-      emit();
+      emit(setNowTime(time));
     });
+
+    socket.on('updateScore', ({ userList }) => {
+      emit(setUserList(userList));
+    });
+
+    socket.on('roundFinish', () => {
+      console.log('roundFinish');
+      emit(setNextRound());
+    })
 
 
     return function unsubscribe() {
@@ -168,11 +181,22 @@ function* setGameInProgressSaga(socket) {
 
     yield put(setNowRound(1));
 
+    // const code = yield select(state => state.room.code);
+    // const timeLimit = yield select(state => state.room.timeLimit);
+    
+    // yield apply(socket, socket.emit, ['roundReady', code]);
+    
+  }
+}
+
+function* setNowRoundSaga(socket) {
+  while (true) {
+    yield take(SET_NOW_ROUND);
+
     const code = yield select(state => state.room.code);
     // const timeLimit = yield select(state => state.room.timeLimit);
     
     yield apply(socket, socket.emit, ['roundReady', code]);
-    
   }
 }
 
@@ -201,8 +225,10 @@ function* clickedWrongSaga(socket) {
     const name = yield select(state => state.room.name);
     const code = yield select(state => state.room.code);
 
+    yield console.log(CLICKED_WRONG)
+
     // socket.emit('score', name, roomCode, isCorrect, sec)
-    yield apply(socket, socket.emit, ['score', name, code, false, 1]);
+    yield apply(socket, socket.emit, ['score', name, code, false, payload]);
   }
 }
 
@@ -212,10 +238,30 @@ function* clickedAnswerSaga(socket) {
 
     const name = yield select(state => state.room.name);
     const code = yield select(state => state.room.code);
+    yield console.log(CLICKED_ANSWER)
+
 
     // socket.emit('score', name, roomCode, isCorrect, sec)
-    yield apply(socket, socket.emit, ['score', name, code, true, 1]);
+    yield apply(socket, socket.emit, ['score', name, code, true, payload]);
   }
+}
+
+function* setNextRoundSaga() {
+  while (true) {
+    yield take(SET_NEXT_ROUND);
+
+    const nowRound = yield select(state => state.room.nowRound);
+    const round = yield select(state => state.room.round);
+
+    if (nowRound + 1 > round) {
+      yield console.log('game end');
+    } else {
+      // TODO: 이미지가 한번 다 돌아야 라운드 증가
+      yield put(setNowRound(nowRound + 1));
+    }
+    
+  }
+
 }
 
 function* handleSocket(socket) {
@@ -232,6 +278,8 @@ function* handleSocket(socket) {
   yield fork(setNowCountdownTimeSaga, socket);
   yield fork(clickedWrongSaga, socket);
   yield fork(clickedAnswerSaga, socket);
+  yield fork(setNowRoundSaga, socket);
+  yield fork(setNextRoundSaga);
 }
 
 function* fetchRoomCodeSaga() {
@@ -305,7 +353,7 @@ function* imageReadySaga() {
   // if (!payload) return;
   while (true) {
     try {
-      const { payload } = yield take(IMAGE_READY);
+      yield take(IMAGE_READY);
 
       const code = yield select(state => state.room.code);
   

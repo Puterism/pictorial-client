@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 import useRoom from '../hooks/useRoom';
@@ -7,7 +7,15 @@ import Stars from '../svgs/Stars.svg';
 import FindingMark from '../svgs/finding-mark.svg';
 import FoundMark from '../svgs/found-mark.svg';
 import ImageOwnerMark from '../svgs/image-owner-mark.svg';
+
+import Alien1 from '../svgs/A1.png';
+import Alien2 from '../svgs/A2.png';
+import Alien3 from '../svgs/A3.png';
+import Alien4 from '../svgs/A4.png';
+import Alien5 from '../svgs/A5.png';
 import Alien6 from '../svgs/A6.png';
+import Alien7 from '../svgs/A7.png';
+import Alien8 from '../svgs/A8.png';
 
 const Styled = {
   Container: styled.div`
@@ -144,6 +152,7 @@ const Styled = {
     }};
     top: ${props => `${props.x1 * 100}%`};
     left: ${props => `${props.y1 * 100}%`};
+    border: ${props => props.show && `solid 6px #a806b5`};
   `,
   TimerContainer: styled.div`
     position: relative;
@@ -174,23 +183,55 @@ const Styled = {
   `,
 }
 
+let stopwatch;
+
 function Game() {
   const { code, connected, userList, round, timeLimit, images, countdown, timer,
-    nowRound, showImage,
+    nowRound, showImage, showAnswer,
     onSetGameReady, onClickedWrong, onClickedAnswer, } = useRoom();
-  // const [nowTime, setNowTime] = useState(timeLimit);
+  const [nowTime, setNowTime] = useState('0.000');
+  const [startTime, setStartTime] = useState(null);
+
 
   useEffect(() => {
-    onSetGameReady(code);
+    onSetGameReady(code);    
   }, [onSetGameReady, code]);
 
+  // const updateNowTime = useCallback(() => {
+  //   const updatedTime = new Date().getTime();
+  //   const diff = updatedTime - startTime;
+
+  //   let seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  //   let milliseconds = Math.floor((diff % (1000 * 60)) / 100);
+    
+  //   seconds = (seconds < 10) ? "0" + seconds : seconds;
+  //   milliseconds = (milliseconds < 100) ? (milliseconds < 10) ? "00" + milliseconds : "0" + milliseconds : milliseconds;
+    
+  //   setNowTime(`${seconds}.${milliseconds}`);
+  // }, [startTime]);
+
+  // useEffect(() => {
+  //   // 게임이 시작됐을 때 스톱워치 시작
+  //   if (countdown === 0) {
+  //     setStartTime(new Date().getTime());
+  //     console.log(startTime);
+  //     // stopwatch = window.setInterval(updateNowTime, 100);
+  //   }
+  //   return () => clearInterval(stopwatch);
+  // }, [countdown, startTime]);
+
+
   const handleClickAnswer = (e) => {
+    if (showAnswer) return;
     e.stopPropagation();
-    console.log('clicked answer!');
+    onClickedAnswer(3 - timer);
+    // clearInterval(stopwatch);
+    // setNowTime(0);
   }
 
   const handleClickWrong = () => {
-    console.log('clicked wrong');
+    if (showAnswer) return;
+    onClickedWrong(3 - timer);
   }
 
   // useEffect(() => {
@@ -221,7 +262,7 @@ function Game() {
             {
               nowRound && nowRound >= 1 ?
               <>
-                { images[nowRound].answerAuto.detection_names }
+                { images[nowRound - 1].answerAuto.detection_names }
               </>
               : <>플레이어를 기다리는 중...</>
             }
@@ -231,10 +272,10 @@ function Game() {
             {
               nowRound && nowRound >= 1 &&
               <>
-                By { images[nowRound].name }
+                By { images[nowRound - 1].name }
               </>
-              
             }
+            { nowTime }
           </Styled.Author>
         </Styled.Header>
         <Styled.ContentContainer>
@@ -250,20 +291,26 @@ function Game() {
             {
               userList.map((user) => (
                 <Styled.UserStat key={user.id}>
-                  {/* { user.profile === 1 && <Styled.UserAlien alien={AlienL1} /> }
-                  { user.profile === 2 && <Styled.UserAlien alien={AlienL2} /> }
-                  { user.profile === 3 && <Styled.UserAlien alien={AlienL3} /> }
-                  { user.profile === 4 && <Styled.UserAlien alien={AlienL4} /> }
-                  { user.profile === 5 && <Styled.UserAlien alien={AlienL5} /> }
-                  { user.profile === 6 && <Styled.UserAlien alien={AlienL6} /> }
-                  { user.profile === 7 && <Styled.UserAlien alien={AlienL7} /> }
-                  { user.profile === 8 && <Styled.UserAlien alien={AlienL8} /> } */}
-                  <Styled.UserAlien alien={Alien6} />
+                  { user.profile === 1 && <Styled.UserAlien alien={Alien1} /> }
+                  { user.profile === 2 && <Styled.UserAlien alien={Alien2} /> }
+                  { user.profile === 3 && <Styled.UserAlien alien={Alien3} /> }
+                  { user.profile === 4 && <Styled.UserAlien alien={Alien4} /> }
+                  { user.profile === 5 && <Styled.UserAlien alien={Alien5} /> }
+                  { user.profile === 6 && <Styled.UserAlien alien={Alien6} /> }
+                  { user.profile === 7 && <Styled.UserAlien alien={Alien7} /> }
+                  { user.profile === 8 && <Styled.UserAlien alien={Alien8} /> }
                   <Styled.UserProfile>
                     <Styled.UserName>{user.name}</Styled.UserName>
                     <Styled.UserScore>{user.score}</Styled.UserScore>
                   </Styled.UserProfile>
-                  <Styled.UserStatus finding />
+                  {
+                    (images[nowRound - 1] && images[nowRound - 1].name === user.name) ?
+                    <Styled.UserStatus owner />
+                    : 
+                    <Styled.UserStatus finding />
+                    
+
+                  }
                 </Styled.UserStat>
               ))
             }
@@ -273,17 +320,18 @@ function Game() {
             <Styled.ImageBox
               onClick={handleClickWrong}
               image={
-                nowRound && nowRound >= 1 && showImage && images[nowRound].base64Img
+                nowRound && nowRound >= 1 && showImage && images[nowRound - 1].base64Img
               }
             >
               {
                 (nowRound && nowRound >= 1 && showImage) ?
                 <Styled.AnswerArea
                   onClick={handleClickAnswer}
-                  x1={images[nowRound].answerAuto.detection_boxes[0]}
-                  y1={images[nowRound].answerAuto.detection_boxes[1]}
-                  x2={images[nowRound].answerAuto.detection_boxes[2]}
-                  y2={images[nowRound].answerAuto.detection_boxes[3]}
+                  show={showAnswer}
+                  x1={images[nowRound - 1].answerAuto.detection_boxes[0]}
+                  y1={images[nowRound - 1].answerAuto.detection_boxes[1]}
+                  x2={images[nowRound - 1].answerAuto.detection_boxes[2]}
+                  y2={images[nowRound - 1].answerAuto.detection_boxes[3]}
                 />
                 :
                 countdown
@@ -294,7 +342,7 @@ function Game() {
         <Styled.TimerContainer>
           <Styled.TimerText>
             {
-              timer &&
+              timer >= 0 &&
               <>{timer} s</>
             }
           </Styled.TimerText>
