@@ -13,6 +13,7 @@ export const CHECK_ROOM_CODE_FAILURE = 'room/CHECK_ROOM_CODE_FAILURE';
 
 export const SET_NAME = 'room/SET_NAME';
 export const SET_CODE = 'room/SET_CODE';
+export const SET_PROFILE = 'room/SET_PROFILE';
 export const SET_ERROR_MESSAGE = 'room/SET_ERROR_MESSAGE';
 
 export const SET_ROUND = 'room/SET_ROUND';
@@ -29,6 +30,19 @@ export const SET_GAME_READY = 'room/SET_GAME_READY';
 
 export const SET_GAME_START = 'room/SET_GAME_START';
 export const SET_GAME_START_SUCCESS = 'room/SET_GAME_START_SUCCESS';
+
+export const SET_GAME_IMAGE_DOWNLOADED = 'room/SET_GAME_IMAGE_DOWNLOADED';
+
+export const SET_NOW_COUNTDOWN_TIME = 'room/SET_NOW_COUNTDOWN_TIME';
+export const SET_NOW_TIME = 'room/SET_NOW_TIME';
+
+export const SET_GAME_IN_PROGRESS = 'room/SET_GAME_IN_PROGRESS';
+
+export const SET_NOW_ROUND = 'room/SET_NOW_ROUND';
+export const SET_SHOW_IMAGE = 'room/SET_SHOW_IMAGE';
+
+export const CLICKED_WRONG = 'room/CLICKED_WRONG';
+export const CLICKED_ANSWER = 'room/CLICKED_ANSWER';
 
 
 // action
@@ -80,6 +94,11 @@ export const setCode = (code) => ({
   type: SET_CODE,
   payload: code,
 });
+
+export const setProfile = (profile) => ({
+  type: SET_PROFILE,
+  payload: profile,
+})
 
 export const setErrorMessage = (message) => ({
   type: SET_ERROR_MESSAGE,
@@ -152,17 +171,59 @@ export const setGameReady = () => ({
   type: SET_GAME_READY,
 });
 
+export const setGameImageDownloaded = () => ({
+  type: SET_GAME_IMAGE_DOWNLOADED,
+});
+
+export const setGameInProgress = (status) => ({
+  type: SET_GAME_IN_PROGRESS,
+  payload: status,
+});
+
+export const setNowCountdownTime = (time) => ({
+  type: SET_NOW_COUNTDOWN_TIME,
+  payload: time,
+});
+
+export const setNowTime = (time) => ({
+  type: SET_NOW_TIME,
+  payload: time,
+});
+
+export const setNowRound = (round) => ({
+  type: SET_NOW_ROUND,
+  payload: round,
+});
+
+export const setShowImage = (status) => ({
+  type: SET_SHOW_IMAGE,
+  payload: status,
+});
+
+export const clickedWrong = (time) => ({
+  type: CLICKED_WRONG,
+
+});
+
+export const clickedAnswer = (time) => ({
+  type: CLICKED_ANSWER,
+});
+
 
 
 const initialState = {
   code: '',
   name: '',
+  profile: 1,
   round: 2,
   timeLimit: 3,
   connected: false,
   userList: [],
   images: [],
   gameReady: false,
+  inProgress: false,
+  nowRound: null,
+  showImage: false,
 }
 
 // reducer
@@ -225,6 +286,12 @@ function room(state = initialState, { type, payload }) {
         code: payload.code,
       };
 
+    case SET_PROFILE:
+      return {
+        ...state,
+        profile: payload,
+      }
+
     case SET_ERROR_MESSAGE:
       return {
         ...state,
@@ -239,7 +306,6 @@ function room(state = initialState, { type, payload }) {
     case CHECK_ROOM_CODE_SUCCESS:
       return {
         ...state,
-        ...payload,
         code: payload.code,
       };
 
@@ -300,7 +366,7 @@ function room(state = initialState, { type, payload }) {
     case IMAGE_READY_SUCCESS:
       return {
         ...state,
-        images: payload.data.answerList,
+        images: payload,
       }
     
     case IMAGE_READY_FAILURE:
@@ -308,6 +374,51 @@ function room(state = initialState, { type, payload }) {
         ...state,
         images: [],
         showError: true,
+      }
+
+    case SET_GAME_IMAGE_DOWNLOADED:
+      return {
+        ...state,
+      }
+
+    case SET_GAME_IN_PROGRESS:
+      return {
+        ...state,
+        inProgress: payload,
+      }
+    
+    case SET_NOW_COUNTDOWN_TIME:
+      return {
+        ...state,
+        countdown: payload,
+      }
+
+    case SET_NOW_TIME:
+      return {
+        ...state,
+        timer: payload,
+      }
+
+    case SET_NOW_ROUND:
+      return {
+        ...state,
+        nowRound: payload,
+      }
+
+    case SET_SHOW_IMAGE:
+      return {
+        ...state,
+        showImage: payload,
+      }
+
+    case CLICKED_WRONG:
+      return {
+        ...state,
+      }
+
+    case CLICKED_ANSWER:
+      return {
+        ...state,
       }
 
     default:

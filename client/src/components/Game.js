@@ -117,7 +117,9 @@ const Styled = {
     border-image-source: linear-gradient(to right, #5728e2, #210081);
     border-image-slice: 1;
     background-color: rgba(0, 0, 0, 0.1);
-    background-image: ${props => `url(${props.image})`};
+    background-image: ${props => (
+      props.image && `url(data:image/jpeg;base64,${props.image})`
+    )};
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 100% 100%;
@@ -128,8 +130,21 @@ const Styled = {
     align-items: center;
     flex-direction: column;
     box-sizing: border-box;
+    color: white;
+    font-size: 5em;
+    cursor: pointer;
   `,
-
+  AnswerArea: styled.div`
+    position: absolute;
+    width: ${props => {
+      return `${(props.y2 - props.y1) * 100}%`
+    }};
+    height: ${props => {
+      return `${(props.x2 - props.x1) * 100}%`
+    }};
+    top: ${props => `${props.x1 * 100}%`};
+    left: ${props => `${props.y1 * 100}%`};
+  `,
   TimerContainer: styled.div`
     position: relative;
     top: 50px;
@@ -160,23 +175,33 @@ const Styled = {
 }
 
 function Game() {
-  const { name, code, connected, userList, onSetUserList, round, timeLimit, onSetGameReady, onImageReady, images } = useRoom();
-  const [nowRound, setNowRound] = useState(0);
-  const [nowTime, setNowTime] = useState(timeLimit);
+  const { code, connected, userList, round, timeLimit, images, countdown, timer,
+    nowRound, showImage,
+    onSetGameReady, onClickedWrong, onClickedAnswer, } = useRoom();
+  // const [nowTime, setNowTime] = useState(timeLimit);
 
   useEffect(() => {
     onSetGameReady(code);
-  }, [onSetGameReady]);
+  }, [onSetGameReady, code]);
 
-  useEffect(() => {
-    if (!nowTime) return;
+  const handleClickAnswer = (e) => {
+    e.stopPropagation();
+    console.log('clicked answer!');
+  }
 
-    const timer = setInterval(() => {
-      setNowTime(nowTime - 1);
-    }, 1000);
+  const handleClickWrong = () => {
+    console.log('clicked wrong');
+  }
 
-    return () => clearInterval(timer);
-  }, [nowTime]);
+  // useEffect(() => {
+  //   if (!nowTime) return;
+
+  //   const timer = setInterval(() => {
+  //     setNowTime(nowTime - 1);
+  //   }, 1000);
+
+  //   return () => clearInterval(timer);
+  // }, [nowTime]);
 
   return (
     <Styled.Container>
@@ -187,32 +212,52 @@ function Game() {
       <Styled.GameContainer>
         <Styled.Header>
           { 
-            nowRound > 0 &&
+            nowRound && nowRound >= 1 && // TODO: nowRound 관련 에러 확인할 것 // onGameInProgress가 아님!
             <Styled.Round>
               { nowRound } / { round } ROUND
             </Styled.Round>
           }
           <Styled.Keyword>
-            플레이어를 기다리는 중...
+            {
+              nowRound && nowRound >= 1 ?
+              <>
+                { images[nowRound].answerAuto.detection_names }
+              </>
+              : <>플레이어를 기다리는 중...</>
+            }
           </Styled.Keyword>
           <Styled.Author>
-            {/* By LOGE */}
+            
+            {
+              nowRound && nowRound >= 1 &&
+              <>
+                By { images[nowRound].name }
+              </>
+              
+            }
           </Styled.Author>
         </Styled.Header>
         <Styled.ContentContainer>
           <Styled.UserList>
-            
-            <Styled.UserStat>
+            {/* <Styled.UserStat>
               <Styled.UserAlien alien={Alien6} />
               <Styled.UserProfile>
                 <Styled.UserName>KkiYubb</Styled.UserName>
                 <Styled.UserScore>3010</Styled.UserScore>
               </Styled.UserProfile>
               <Styled.UserStatus owner />
-            </Styled.UserStat>
+            </Styled.UserStat> */}
             {
               userList.map((user) => (
                 <Styled.UserStat key={user.id}>
+                  {/* { user.profile === 1 && <Styled.UserAlien alien={AlienL1} /> }
+                  { user.profile === 2 && <Styled.UserAlien alien={AlienL2} /> }
+                  { user.profile === 3 && <Styled.UserAlien alien={AlienL3} /> }
+                  { user.profile === 4 && <Styled.UserAlien alien={AlienL4} /> }
+                  { user.profile === 5 && <Styled.UserAlien alien={AlienL5} /> }
+                  { user.profile === 6 && <Styled.UserAlien alien={AlienL6} /> }
+                  { user.profile === 7 && <Styled.UserAlien alien={AlienL7} /> }
+                  { user.profile === 8 && <Styled.UserAlien alien={AlienL8} /> } */}
                   <Styled.UserAlien alien={Alien6} />
                   <Styled.UserProfile>
                     <Styled.UserName>{user.name}</Styled.UserName>
@@ -225,17 +270,36 @@ function Game() {
           </Styled.UserList>
 
           <Styled.Game>
-            <Styled.ImageBox>
-
+            <Styled.ImageBox
+              onClick={handleClickWrong}
+              image={
+                nowRound && nowRound >= 1 && showImage && images[nowRound].base64Img
+              }
+            >
+              {
+                (nowRound && nowRound >= 1 && showImage) ?
+                <Styled.AnswerArea
+                  onClick={handleClickAnswer}
+                  x1={images[nowRound].answerAuto.detection_boxes[0]}
+                  y1={images[nowRound].answerAuto.detection_boxes[1]}
+                  x2={images[nowRound].answerAuto.detection_boxes[2]}
+                  y2={images[nowRound].answerAuto.detection_boxes[3]}
+                />
+                :
+                countdown
+              }
             </Styled.ImageBox>
           </Styled.Game>
         </Styled.ContentContainer>
         <Styled.TimerContainer>
           <Styled.TimerText>
-            { nowTime } s
+            {
+              timer &&
+              <>{timer} s</>
+            }
           </Styled.TimerText>
           <Styled.TimerBar>
-            <Styled.TimerBarCurrent percentage={(100 / timeLimit) * nowTime} />
+            <Styled.TimerBarCurrent percentage={(100 / timeLimit) * timer} />
           </Styled.TimerBar>
         </Styled.TimerContainer>
       </Styled.GameContainer>

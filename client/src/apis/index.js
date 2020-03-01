@@ -48,21 +48,11 @@ export async function imageUpload(payload) {
   }
 }
 
-export async function imageReady(code) {
+export async function imageReadyRequest(code) {
   try {
     const response = await axios.get(`${END_POINT}/images/ready?code=${code}`);
-
-    // const response = await axios({
-    //   method: 'get',
-    //   url: `${END_POINT}/images/ready`,
-    //   query: {
-    //     code
-    //   },
-    // });
-    console.log({ code });
     return response;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }

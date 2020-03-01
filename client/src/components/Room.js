@@ -7,6 +7,13 @@ import Stars from '../svgs/Stars.svg';
 import Circle from '../svgs/circle.svg';
 import SmallCircle from '../svgs/small_circle.svg';
 import AlienL1 from '../svgs/alienL1.svg';
+import AlienL2 from '../svgs/alienL2.svg';
+import AlienL3 from '../svgs/alienL3.svg';
+import AlienL4 from '../svgs/alienL4.svg';
+import AlienL5 from '../svgs/alienL5.svg';
+import AlienL6 from '../svgs/alienL6.svg';
+import AlienL7 from '../svgs/alienL7.svg';
+import AlienL8 from '../svgs/alienL8.svg';
 import LinkShareBtn from '../svgs/link-share-btn.svg';
 import { ReactComponent as Left } from '../svgs/left.svg';
 import { ReactComponent as Right } from '../svgs/right.svg';
@@ -182,7 +189,8 @@ const Styled = {
 
 function Room() {
   const { code } = useParams();
-  const { name, connected, round, timeLimit, userList, onSetRound, onSetTimeLimit, onSetGameStart } = useRoom();
+  const { name, connected, round, timeLimit, userList, profile,
+    onSetRound, onSetTimeLimit, onSetGameStart, onSetProfile } = useRoom();
 
   const handleLinkShare = () => {
     const url = `https://pictorial.surge.sh/${code}`;
@@ -192,6 +200,23 @@ function Room() {
     textareaElement.select();
     document.execCommand('copy');
     document.body.removeChild(textareaElement);
+  }
+
+  const handleChangeProfile = (to) => {
+    const PROFILE_MAX_NUM = 8;
+    if (to === 'left') {
+      if (profile <= 1) {
+        onSetProfile(PROFILE_MAX_NUM);
+      } else {
+        onSetProfile(profile - 1);
+      }
+    } else {
+      if (profile >= PROFILE_MAX_NUM) {
+        onSetProfile(1);
+      } else {
+        onSetProfile(profile + 1);
+      }
+    }
   }
 
   const handleChangeRound = (e) => {
@@ -218,15 +243,22 @@ function Room() {
       <Styled.Lobby>
         <Styled.Name>{ name }</Styled.Name>
         <Styled.CharacterSelectContainer>
-          {/* <Styled.SelectButton left>
+          <Styled.SelectButton left onClick={() => handleChangeProfile('left')}>
             <Left />
-          </Styled.SelectButton> */}
+          </Styled.SelectButton>
           <Styled.AlienContainer>
-            <Styled.Alien alien={AlienL1} />
+            { profile === 1 && <Styled.Alien alien={AlienL1} /> }
+            { profile === 2 && <Styled.Alien alien={AlienL2} /> }
+            { profile === 3 && <Styled.Alien alien={AlienL3} /> }
+            { profile === 4 && <Styled.Alien alien={AlienL4} /> }
+            { profile === 5 && <Styled.Alien alien={AlienL5} /> }
+            { profile === 6 && <Styled.Alien alien={AlienL6} /> }
+            { profile === 7 && <Styled.Alien alien={AlienL7} /> }
+            { profile === 8 && <Styled.Alien alien={AlienL8} /> }
           </Styled.AlienContainer>
-          {/* <Styled.SelectButton right>
+          <Styled.SelectButton right onClick={() => handleChangeProfile('right')}>
             <Right />
-          </Styled.SelectButton> */}
+          </Styled.SelectButton>
         </Styled.CharacterSelectContainer>
         <Styled.MiddleContainer>
           <Styled.StartButton onClick={handleClickStart}>
@@ -270,7 +302,14 @@ function Room() {
             userList.filter(user => user.name !== name).map((user) => (
               <Styled.UserContainer key={user.id}>
                 <Styled.UserAlienContainer>
-                  <Styled.UserAlien alien={AlienL1} />
+                  { user.profile === 1 && <Styled.UserAlien alien={AlienL1} /> }
+                  { user.profile === 2 && <Styled.UserAlien alien={AlienL2} /> }
+                  { user.profile === 3 && <Styled.UserAlien alien={AlienL3} /> }
+                  { user.profile === 4 && <Styled.UserAlien alien={AlienL4} /> }
+                  { user.profile === 5 && <Styled.UserAlien alien={AlienL5} /> }
+                  { user.profile === 6 && <Styled.UserAlien alien={AlienL6} /> }
+                  { user.profile === 7 && <Styled.UserAlien alien={AlienL7} /> }
+                  { user.profile === 8 && <Styled.UserAlien alien={AlienL8} /> }
                 </Styled.UserAlienContainer>
                 <Styled.UserName>{ user.name }</Styled.UserName>
                 <Styled.UserStatus>
