@@ -40,10 +40,17 @@ export const SET_GAME_IN_PROGRESS = 'room/SET_GAME_IN_PROGRESS';
 
 export const SET_NOW_ROUND = 'room/SET_NOW_ROUND';
 export const SET_NEXT_ROUND = 'room/SET_NEXT_ROUND';
+
+export const SET_NOW_IMAGE = 'room/SET_NOW_IMAGE';
+export const SET_NEXT_IMAGE = 'room/SET_NEXT_IMAGE';
 export const SET_SHOW_IMAGE = 'room/SET_SHOW_IMAGE';
+export const SET_SHOW_SCOREBOARD = 'room/SET_SHOW_SCOREBOARD';
+export const SET_SHOW_RESULT = 'room/SET_SHOW_RESULT';
 
 export const CLICKED_WRONG = 'room/CLICKED_WRONG';
 export const CLICKED_ANSWER = 'room/CLICKED_ANSWER';
+
+export const SET_RESULT_USER_LIST = 'room/SET_RESULT_USER_LIST';
 
 
 // action
@@ -198,10 +205,24 @@ export const setNowRound = (round) => ({
 
 export const setNextRound = () => ({
   type: SET_NEXT_ROUND,
-})
+});
+
+export const setNowImage = (imageIndex) => ({
+  type: SET_NOW_IMAGE,
+  payload: imageIndex,
+});
+
+export const setNextImage = () => ({
+  type: SET_NEXT_IMAGE,
+});
 
 export const setShowImage = (status) => ({
   type: SET_SHOW_IMAGE,
+  payload: status,
+});
+
+export const setShowScoreboard = (status) => ({
+  type: SET_SHOW_SCOREBOARD,
   payload: status,
 });
 
@@ -213,6 +234,16 @@ export const clickedWrong = (time) => ({
 export const clickedAnswer = (time) => ({
   type: CLICKED_ANSWER,
   payload: time,
+});
+
+export const setShowResult = (status) => ({
+  type: SET_SHOW_RESULT,
+  payload: status,
+});
+
+export const setResultUserList = (list) => ({
+  type: SET_RESULT_USER_LIST,
+  payload: list,
 });
 
 
@@ -228,9 +259,13 @@ const initialState = {
   images: [],
   gameReady: false,
   inProgress: false,
+  nowImage: null,
   nowRound: null,
   showImage: false,
   showAnswer: false,
+  showScoreboard: false,
+  showResult: false,
+  resultUserList: [],
 }
 
 // reducer
@@ -319,7 +354,6 @@ function room(state = initialState, { type, payload }) {
     case CHECK_ROOM_CODE_FAILURE:
       return {
         ...state,
-        ...payload,
         errorMessage: payload.response.data.message,
         connected: false,
         showError: true,
@@ -420,10 +454,30 @@ function room(state = initialState, { type, payload }) {
         countdown: 3,
       }
 
+    case SET_NOW_IMAGE:
+      return {
+        ...state,
+        nowImage: payload,
+      }
+
+    case SET_NEXT_IMAGE:
+      return {
+        ...state,
+        showImage: false,
+        showAnswer: false,
+        countdown: 3,
+      }
+
     case SET_SHOW_IMAGE:
       return {
         ...state,
         showImage: payload,
+      }
+
+    case SET_SHOW_SCOREBOARD:
+      return {
+        ...state,
+        showScoreboard: payload,
       }
 
     case CLICKED_WRONG:
@@ -435,6 +489,18 @@ function room(state = initialState, { type, payload }) {
       return {
         ...state,
         showAnswer: true,
+      }
+
+    case SET_SHOW_RESULT:
+      return {
+        ...state,
+        showResult: payload,
+      }
+
+    case SET_RESULT_USER_LIST:
+      return {
+        ...state,
+        resultUserList: payload,
       }
 
     default:

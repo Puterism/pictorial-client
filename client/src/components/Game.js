@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import useRoom from '../hooks/useRoom';
 
@@ -7,7 +7,12 @@ import Stars from '../svgs/Stars.svg';
 import FindingMark from '../svgs/finding-mark.svg';
 import FoundMark from '../svgs/found-mark.svg';
 import ImageOwnerMark from '../svgs/image-owner-mark.svg';
-
+import ScoreBoard from '../svgs/scoreboard.svg';
+import Result from '../svgs/result.svg';
+import Flakes from '../svgs/flakes.svg';
+import { ReactComponent as Crown1 } from '../svgs/crown-1.svg';
+import { ReactComponent as Crown2 } from '../svgs/crown-2.svg';
+import { ReactComponent as Crown3 } from '../svgs/crown-3.svg';
 import Alien1 from '../svgs/A1.png';
 import Alien2 from '../svgs/A2.png';
 import Alien3 from '../svgs/A3.png';
@@ -181,20 +186,155 @@ const Styled = {
     border-radius: 15px;
     background-image: linear-gradient(to top, #a806b5, #5728e2);
   `,
+  ScoreBoardContainer: styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 1556px;
+    height: 972px;
+    background-image: ${`url(${ScoreBoard})`};
+    background-position: center;
+    background-size: 100%;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `,
+  ScoreBoard: styled.div`
+    width: 652px;
+    height: 440px;
+  `,
+  ScoreBoardItem: styled.div`
+    width: 652px;
+    height: 57px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    background-image: linear-gradient(to right, #210081, #5728e2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  `,
+  ScoreBoardName: styled.span`
+    font-weight: bold;
+    font-size: 36px;
+    line-height: 1.3;
+    letter-spacing: 0.36px;
+    color: #ffffff;
+    display: block;
+    margin-left: 35px;
+  `,
+  ScoreBoardScore: styled.span`
+    font-weight: bold;
+    font-size: 40px;
+    line-height: 1.3;
+    letter-spacing: 0.36px;
+    color: #ffffff;
+    display: block;
+    margin-right: 32px;
+  `,
+  ResultContainer: styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 1304px;
+    height: 891px;
+    background-image: ${`url(${Result})`};
+    background-position: center;
+    background-size: 100%;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `,
+  Result: styled.div`
+    width: 670px;
+    height: 500px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  `,
+  Flakes: styled.div`
+    width: 569px;
+    height: 246px;
+    background-image: ${`url(${Flakes})`};
+    position: absolute;
+    top: 42px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+  `,
+  ResultTopItem: styled.div`
+    color: #a806b5;
+    position: absolute;
+    left: ${props => props.second && '100px'};
+    right: ${props => props.third && '100px'};
+    top: ${props => props.first ? '50px' : '120px'};
+    text-align: center;
+    display: ${props => !props.first && 'inline-block'};
+    /* float: ${props => props.second ? 'left' : props.third && 'right'}; */
+  `,
+  ResultTopItemName: styled.div`
+    font-weight: bold;
+    font-size: ${props => props.first ? '36px' : '24px'};
+  `,
+  ResultTopItemScore: styled.div`
+    font-weight: 800;
+    font-size: ${props => props.first ? '48px' : '36px'};
+  `,
+  ResultItemList: styled.div`
+    margin-top: 100px;
+  `,
+  ResultItem: styled.div`
+    width: 371px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  `,
+  ResultItemName: styled.span`
+    font-weight: bold;
+    font-size: 30px;
+    color: #210081;
+  `,
+  ResultItemScore: styled.span`
+    font-weight: bold;
+    font-size: 30px;
+    color: #210081;
+  `,
+  ResultBackButton: styled.button`
+    position: absolute;
+    width: 255px;
+    height: 70px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.25);
+    border: solid 3px #ffffff;
+    background-image: linear-gradient(to top, #a806b5, #210081);
+    letter-spacing: 7.2px;
+    color: #ffffff;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 30px;
+    bottom: -70px;
+    cursor: pointer;
+  `,
 }
 
 let stopwatch;
 
-function Game() {
+function Game({ history }) {
   const { code, connected, userList, round, timeLimit, images, countdown, timer,
-    nowRound, showImage, showAnswer,
-    onSetGameReady, onClickedWrong, onClickedAnswer, } = useRoom();
+    nowRound, nowImage, showImage, showAnswer, showScoreboard, showResult,
+    onSetGameReady, onClickedWrong, onClickedAnswer, resultUserList } = useRoom();
   const [nowTime, setNowTime] = useState('0.000');
   const [startTime, setStartTime] = useState(null);
 
-
   useEffect(() => {
-    onSetGameReady(code);    
+    onSetGameReady(code);
   }, [onSetGameReady, code]);
 
   // const updateNowTime = useCallback(() => {
@@ -220,9 +360,8 @@ function Game() {
   //   return () => clearInterval(stopwatch);
   // }, [countdown, startTime]);
 
-
   const handleClickAnswer = (e) => {
-    if (showAnswer) return;
+    if (showAnswer || !showImage) return;
     e.stopPropagation();
     onClickedAnswer(3 - timer);
     // clearInterval(stopwatch);
@@ -230,8 +369,12 @@ function Game() {
   }
 
   const handleClickWrong = () => {
-    if (showAnswer) return;
+    if (showAnswer || !showImage) return;
     onClickedWrong(3 - timer);
+  }
+
+  const handleClickResultBtn = () => {
+    history.push(`/room/${code}`)
   }
 
   // useEffect(() => {
@@ -253,26 +396,25 @@ function Game() {
       <Styled.GameContainer>
         <Styled.Header>
           { 
-            nowRound && nowRound >= 1 && // TODO: nowRound 관련 에러 확인할 것 // onGameInProgress가 아님!
+            nowRound && nowRound > 0 && 
             <Styled.Round>
               { nowRound } / { round } ROUND
             </Styled.Round>
           }
           <Styled.Keyword>
             {
-              nowRound && nowRound >= 1 ?
+              nowImage && nowImage > 0 ?
               <>
-                { images[nowRound - 1].answerAuto.detection_names }
+                { images[nowImage - 1].answerAuto.detection_names }
               </>
               : <>플레이어를 기다리는 중...</>
             }
           </Styled.Keyword>
           <Styled.Author>
-            
             {
-              nowRound && nowRound >= 1 &&
+              nowImage && nowImage > 0 &&
               <>
-                By { images[nowRound - 1].name }
+                By { images[nowImage - 1].name }
               </>
             }
             { nowTime }
@@ -304,12 +446,10 @@ function Game() {
                     <Styled.UserScore>{user.score}</Styled.UserScore>
                   </Styled.UserProfile>
                   {
-                    (images[nowRound - 1] && images[nowRound - 1].name === user.name) ?
+                    (nowImage > 0 && images[nowImage - 1].name === user.name) ?
                     <Styled.UserStatus owner />
                     : 
                     <Styled.UserStatus finding />
-                    
-
                   }
                 </Styled.UserStat>
               ))
@@ -320,18 +460,19 @@ function Game() {
             <Styled.ImageBox
               onClick={handleClickWrong}
               image={
-                nowRound && nowRound >= 1 && showImage && images[nowRound - 1].base64Img
+                (nowImage && nowImage > 0 && showImage) &&
+                images[nowImage - 1].base64Img
               }
             >
               {
-                (nowRound && nowRound >= 1 && showImage) ?
+                (nowImage && nowImage > 0 && showImage) ?
                 <Styled.AnswerArea
                   onClick={handleClickAnswer}
                   show={showAnswer}
-                  x1={images[nowRound - 1].answerAuto.detection_boxes[0]}
-                  y1={images[nowRound - 1].answerAuto.detection_boxes[1]}
-                  x2={images[nowRound - 1].answerAuto.detection_boxes[2]}
-                  y2={images[nowRound - 1].answerAuto.detection_boxes[3]}
+                  x1={images[nowImage - 1].answerAuto.detection_boxes[0]}
+                  y1={images[nowImage - 1].answerAuto.detection_boxes[1]}
+                  x2={images[nowImage - 1].answerAuto.detection_boxes[2]}
+                  y2={images[nowImage - 1].answerAuto.detection_boxes[3]}
                 />
                 :
                 countdown
@@ -351,6 +492,75 @@ function Game() {
           </Styled.TimerBar>
         </Styled.TimerContainer>
       </Styled.GameContainer>
+      {
+        (showScoreboard) &&
+        <Styled.ScoreBoardContainer>
+          <Styled.ScoreBoard>
+            {
+              userList.map((user) => (
+                <Styled.ScoreBoardItem key={user.id}>
+                  <Styled.ScoreBoardName>
+                    { user.name }
+                  </Styled.ScoreBoardName>
+                  <Styled.ScoreBoardScore>
+                    { user.score }
+                  </Styled.ScoreBoardScore>
+                </Styled.ScoreBoardItem>
+              ))
+            }
+          </Styled.ScoreBoard>
+        </Styled.ScoreBoardContainer>
+      }
+      {
+        (showResult && resultUserList.length > 0) &&
+        <Styled.ResultContainer>
+          <Styled.Result>
+            <Styled.Flakes />
+            {
+              resultUserList.map((user, index) => (
+                (index === 0) ?
+                <Styled.ResultTopItem key={user.id} first>
+                  <Crown1 />
+                  <Styled.ResultTopItemName first>{user.name}</Styled.ResultTopItemName>
+                  <Styled.ResultTopItemScore first>{user.score}점</Styled.ResultTopItemScore>
+                </Styled.ResultTopItem>
+                : (index === 1) ?
+                <Styled.ResultTopItem key={user.id} second>
+                  <Crown2 />
+                  <Styled.ResultTopItemName second>{user.name}</Styled.ResultTopItemName>
+                  <Styled.ResultTopItemScore second>{user.score}점</Styled.ResultTopItemScore>
+                </Styled.ResultTopItem>
+                : (index === 2) ?
+                <Styled.ResultTopItem key={user.id} third>
+                  <Crown3 />
+                  <Styled.ResultTopItemName third>{user.name}</Styled.ResultTopItemName>
+                  <Styled.ResultTopItemScore third>{user.score}점</Styled.ResultTopItemScore>
+                </Styled.ResultTopItem>
+                : 
+                <Styled.ResultItem key={user.id}>
+                  <Styled.ResultItemName>
+                    {user.name}
+                  </Styled.ResultItemName>
+                  <Styled.ResultItemScore>
+                    {user.score}
+                  </Styled.ResultItemScore>
+                </Styled.ResultItem>
+              ))
+            }
+            {/* <Styled.ResultItemList>
+              <Styled.ResultItem>
+                <Styled.ResultItemName>
+                  wdas
+                </Styled.ResultItemName>
+                <Styled.ResultItemScore>
+                  2334점
+                </Styled.ResultItemScore>
+              </Styled.ResultItem>
+            </Styled.ResultItemList> */}
+            <Styled.ResultBackButton onClick={handleClickResultBtn}>돌아가기</Styled.ResultBackButton>
+          </Styled.Result>
+        </Styled.ResultContainer>
+      }
     </Styled.Container>
   )
 }
