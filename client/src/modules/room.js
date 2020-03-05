@@ -27,6 +27,7 @@ export const IMAGE_READY_SUCCESS = 'room/IMAGE_READY_SUCCESS';
 export const IMAGE_READY_FAILURE = 'room/IMAGE_READY_FAILURE';
 
 export const SET_GAME_READY = 'room/SET_GAME_READY';
+export const SET_GAME_READY_USER_LIST = 'room/SET_GAME_READY_USER_LIST';
 
 export const SET_GAME_START = 'room/SET_GAME_START';
 export const SET_GAME_START_SUCCESS = 'room/SET_GAME_START_SUCCESS';
@@ -40,6 +41,9 @@ export const SET_GAME_IN_PROGRESS = 'room/SET_GAME_IN_PROGRESS';
 
 export const SET_NOW_ROUND = 'room/SET_NOW_ROUND';
 export const SET_NEXT_ROUND = 'room/SET_NEXT_ROUND';
+export const SET_ROUND_STARTED_TIME = 'room/SET_ROUND_STARTED_TIME';
+export const SET_ROUND_STARTED_USER_LIST = 'room/SET_ROUND_STARTED_USER_LIST';
+export const SET_SCOREBOARD_USER_LIST = 'room/SET_SCOREBOARD_USER_LIST';
 
 export const SET_NOW_IMAGE = 'room/SET_NOW_IMAGE';
 export const SET_NEXT_IMAGE = 'room/SET_NEXT_IMAGE';
@@ -180,6 +184,11 @@ export const setGameReady = () => ({
   type: SET_GAME_READY,
 });
 
+export const setGameReadyUserList = (list) => ({
+  type: SET_GAME_READY_USER_LIST,
+  payload: list,
+})
+
 export const setGameImageDownloaded = () => ({
   type: SET_GAME_IMAGE_DOWNLOADED,
 });
@@ -208,6 +217,21 @@ export const setNextRound = () => ({
   type: SET_NEXT_ROUND,
 });
 
+export const setRoundStartedTime = (time) => ({
+  type: SET_ROUND_STARTED_TIME,
+  payload: time,
+});
+
+export const setRoundStartedUserList = (list) => ({
+  type: SET_ROUND_STARTED_USER_LIST,
+  payload: list,
+});
+
+export const setScoreboardUserList = (list) => ({
+  type: SET_SCOREBOARD_USER_LIST,
+  payload: list,
+})
+
 export const setNowImage = (imageIndex) => ({
   type: SET_NOW_IMAGE,
   payload: imageIndex,
@@ -227,14 +251,12 @@ export const setShowScoreboard = (status) => ({
   payload: status,
 });
 
-export const clickedWrong = (time) => ({
+export const clickedWrong = () => ({
   type: CLICKED_WRONG,
-  payload: time,
 });
 
-export const clickedAnswer = (time) => ({
+export const clickedAnswer = () => ({
   type: CLICKED_ANSWER,
-  payload: time,
 });
 
 export const setShowResult = (status) => ({
@@ -263,6 +285,8 @@ const initialState = {
   userList: [],
   images: [],
   gameReady: false,
+  gameReadyUserList: [],
+  scoreboardUserList: [],
   inProgress: false,
   nowImage: null,
   nowRound: null,
@@ -271,6 +295,8 @@ const initialState = {
   showScoreboard: false,
   showResult: false,
   resultUserList: [],
+  roundStartedTime: null,
+  roundStartedUserList: [],
 }
 
 // reducer
@@ -394,6 +420,18 @@ function room(state = initialState, { type, payload }) {
         gameReady: true,
       }
 
+    case SET_GAME_READY_USER_LIST:
+      return {
+        ...state,
+        gameReadyUserList: payload,
+      }
+
+    case SET_SCOREBOARD_USER_LIST:
+      return {
+        ...state,
+        scoreboardUserList: payload,
+      }
+
     case SET_GAME_START:
       return {
         ...state,
@@ -459,6 +497,18 @@ function room(state = initialState, { type, payload }) {
         countdown: 3,
       }
 
+    case SET_ROUND_STARTED_TIME:
+      return {
+        ...state,
+        roundStartedTime: payload,
+      }
+
+    case SET_ROUND_STARTED_USER_LIST:
+      return {
+        ...state,
+        roundStartedUserList: payload,
+      }
+
     case SET_NOW_IMAGE:
       return {
         ...state,
@@ -512,6 +562,7 @@ function room(state = initialState, { type, payload }) {
       return {
         ...state,
         gameReady: false,
+        gameReadyUserList: [],
         inProgress: false,
         showResult: false,
         nowImage: null,

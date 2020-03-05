@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Redirect, Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 import useRoom from '../hooks/useRoom';
 
@@ -324,64 +324,26 @@ const Styled = {
   `,
 }
 
-let stopwatch;
-
-function Game({ history }) {
-  const { code, connected, userList, round, timeLimit, images, countdown, timer,
-    nowRound, nowImage, showImage, showAnswer, showScoreboard, showResult, 
+function Game() {
+  const { code, connected, gameReadyUserList, round, timeLimit, images, countdown, timer,
+    nowRound, nowImage, showImage, showAnswer, showScoreboard, showResult, scoreboardUserList,
     onSetGameReady, onClickedWrong, onClickedAnswer, resultUserList, onReturnToLobby } = useRoom();
-  const [nowTime, setNowTime] = useState('0.000');
-  const [startTime, setStartTime] = useState(null);
+  
 
   useEffect(() => {
     onSetGameReady(code);
   }, [onSetGameReady, code]);
 
-  // const updateNowTime = useCallback(() => {
-  //   const updatedTime = new Date().getTime();
-  //   const diff = updatedTime - startTime;
-
-  //   let seconds = Math.floor((diff % (1000 * 60)) / 1000);
-  //   let milliseconds = Math.floor((diff % (1000 * 60)) / 100);
-    
-  //   seconds = (seconds < 10) ? "0" + seconds : seconds;
-  //   milliseconds = (milliseconds < 100) ? (milliseconds < 10) ? "00" + milliseconds : "0" + milliseconds : milliseconds;
-    
-  //   setNowTime(`${seconds}.${milliseconds}`);
-  // }, [startTime]);
-
-  // useEffect(() => {
-  //   // 게임이 시작됐을 때 스톱워치 시작
-  //   if (countdown === 0) {
-  //     setStartTime(new Date().getTime());
-  //     console.log(startTime);
-  //     // stopwatch = window.setInterval(updateNowTime, 100);
-  //   }
-  //   return () => clearInterval(stopwatch);
-  // }, [countdown, startTime]);
-
   const handleClickAnswer = (e) => {
     if (showAnswer || !showImage) return;
     e.stopPropagation();
-    onClickedAnswer(3 - timer);
-    // clearInterval(stopwatch);
-    // setNowTime(0);
+    onClickedAnswer();
   }
 
   const handleClickWrong = () => {
     if (showAnswer || !showImage) return;
-    onClickedWrong(3 - timer);
+    onClickedWrong();
   }
-
-  // useEffect(() => {
-  //   if (!nowTime) return;
-
-  //   const timer = setInterval(() => {
-  //     setNowTime(nowTime - 1);
-  //   }, 1000);
-
-  //   return () => clearInterval(timer);
-  // }, [nowTime]);
 
   return (
     <Styled.Container>
@@ -413,21 +375,12 @@ function Game({ history }) {
                 By { images[nowImage - 1].name }
               </>
             }
-            { nowTime }
           </Styled.Author>
         </Styled.Header>
         <Styled.ContentContainer>
           <Styled.UserList>
-            {/* <Styled.UserStat>
-              <Styled.UserAlien alien={Alien6} />
-              <Styled.UserProfile>
-                <Styled.UserName>KkiYubb</Styled.UserName>
-                <Styled.UserScore>3010</Styled.UserScore>
-              </Styled.UserProfile>
-              <Styled.UserStatus owner />
-            </Styled.UserStat> */}
             {
-              userList.map((user) => (
+              gameReadyUserList.map((user) => (
                 <Styled.UserStat key={user.id}>
                   { user.profile === 1 && <Styled.UserAlien alien={Alien1} /> }
                   { user.profile === 2 && <Styled.UserAlien alien={Alien2} /> }
@@ -493,12 +446,13 @@ function Game({ history }) {
         <Styled.ScoreBoardContainer>
           <Styled.ScoreBoard>
             {
-              userList.map((user) => (
+              scoreboardUserList.map((user) => (
                 <Styled.ScoreBoardItem key={user.id}>
                   <Styled.ScoreBoardName>
                     { user.name }
                   </Styled.ScoreBoardName>
                   <Styled.ScoreBoardScore>
+                    { user.score > 0 && '+ ' } 
                     { user.score }
                   </Styled.ScoreBoardScore>
                 </Styled.ScoreBoardItem>
