@@ -51,6 +51,7 @@ export const CLICKED_WRONG = 'room/CLICKED_WRONG';
 export const CLICKED_ANSWER = 'room/CLICKED_ANSWER';
 
 export const SET_RESULT_USER_LIST = 'room/SET_RESULT_USER_LIST';
+export const RETURN_TO_LOBBY = 'room/RETURN_TO_LOBBY';
 
 
 // action
@@ -244,6 +245,10 @@ export const setShowResult = (status) => ({
 export const setResultUserList = (list) => ({
   type: SET_RESULT_USER_LIST,
   payload: list,
+});
+
+export const returnToLobby = () => ({
+  type: RETURN_TO_LOBBY,
 });
 
 
@@ -501,6 +506,18 @@ function room(state = initialState, { type, payload }) {
       return {
         ...state,
         resultUserList: payload,
+      }
+    
+    case RETURN_TO_LOBBY:
+      return {
+        ...state,
+        gameReady: false,
+        inProgress: false,
+        showResult: false,
+        nowImage: null,
+        nowRound: null,
+        images: [],
+        resultUserList: [],
       }
 
     default:

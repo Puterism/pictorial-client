@@ -16,7 +16,7 @@ import {
   setNowCountdownTime, setNowTime,
   setNowRound, setNextRound, 
   setNowImage, setNextImage,
-  setShowImage, setShowScoreboard, setResultUserList, setShowResult, 
+  setShowImage, setShowScoreboard, setResultUserList, setShowResult, RETURN_TO_LOBBY, 
 } from '../modules/room';
 import { push } from 'connected-react-router';
 import { createRoom, checkRoomCode, connectRoom, imageReadyRequest } from '../apis';
@@ -203,6 +203,16 @@ function* setNowImageSaga(socket) {
   }
 }
 
+function* returnToLobbySaga(socket) {
+  while (true){
+    yield take(RETURN_TO_LOBBY);
+    const code = yield select(state => state.room.code);
+
+    yield apply(socket, socket.emit, ['setGameStart', code, false]);
+    yield put(push(`/room/${code}`));
+  }
+}
+
 // function* setNowRoundSaga(socket) {
 //   while (true) {
 //     yield take(SET_NOW_ROUND);
@@ -332,6 +342,7 @@ function* setShowScoreboardSaga() {
       // TODO: 타이머 타이밍이 틀어짐
       // TODO: 스톱워치 구현하기
       // TODO: 점수판에서 변화값 계산해서 보여주기
+      // TODO: imageReady 초기화하기
     }
   }
 }
@@ -355,6 +366,7 @@ function* handleSocket(socket) {
   yield fork(setShowScoreboardSaga, socket);
   yield fork(setNextImageSaga);
   yield fork(setNextRoundSaga);
+  yield fork(returnToLobbySaga, socket);
 }
 
 function* fetchRoomCodeSaga() {

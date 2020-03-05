@@ -4,7 +4,7 @@ import { fetchRoomCode, connectRoom, checkRoomCode,
   setName, setCode, setProfile, setErrorMessage,
   setRound, setTimeLimit, setUserList,
   imageReady, setGameReady, setGameStart, setNowCountdownTime,
-  clickedWrong, clickedAnswer,
+  clickedWrong, clickedAnswer, returnToLobby,
 } from '../modules/room'
 
 export default function useRoom() {
@@ -110,6 +110,11 @@ export default function useRoom() {
     [dispatch]
   );
 
+  const onReturnToLobby = useCallback(
+    () => dispatch(returnToLobby()),
+    [dispatch]
+  );
+
   return {
     name, code, profile, errorMessage, round, timeLimit, connected, userList, 
     images, inProgress, countdown, timer, nowRound, nowImage,
@@ -118,6 +123,6 @@ export default function useRoom() {
     onSetName, onSetCode, onSetProfile, onSetRound, onSetTimeLimit,
     onCheckRoomCode, onSetUserList, onImageReady,
     onSetErrorMessage, onSetGameReady, onSetGameStart, 
-    onSetNowCountdownTime, onClickedWrong, onClickedAnswer,
+    onSetNowCountdownTime, onClickedWrong, onClickedAnswer, onReturnToLobby,
   };
 }

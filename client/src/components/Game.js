@@ -328,8 +328,8 @@ let stopwatch;
 
 function Game({ history }) {
   const { code, connected, userList, round, timeLimit, images, countdown, timer,
-    nowRound, nowImage, showImage, showAnswer, showScoreboard, showResult,
-    onSetGameReady, onClickedWrong, onClickedAnswer, resultUserList } = useRoom();
+    nowRound, nowImage, showImage, showAnswer, showScoreboard, showResult, 
+    onSetGameReady, onClickedWrong, onClickedAnswer, resultUserList, onReturnToLobby } = useRoom();
   const [nowTime, setNowTime] = useState('0.000');
   const [startTime, setStartTime] = useState(null);
 
@@ -371,10 +371,6 @@ function Game({ history }) {
   const handleClickWrong = () => {
     if (showAnswer || !showImage) return;
     onClickedWrong(3 - timer);
-  }
-
-  const handleClickResultBtn = () => {
-    history.push(`/room/${code}`)
   }
 
   // useEffect(() => {
@@ -557,7 +553,7 @@ function Game({ history }) {
                 </Styled.ResultItemScore>
               </Styled.ResultItem>
             </Styled.ResultItemList> */}
-            <Styled.ResultBackButton onClick={handleClickResultBtn}>돌아가기</Styled.ResultBackButton>
+            <Styled.ResultBackButton onClick={onReturnToLobby}>돌아가기</Styled.ResultBackButton>
           </Styled.Result>
         </Styled.ResultContainer>
       }
