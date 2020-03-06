@@ -227,6 +227,11 @@ function ImageUpload() {
     if (menu === 'upload') {
       // onInitImage();
     }
+
+    if (menu === 'manual') {
+      alert('수동출제는 준비 중입니다.');
+      return;
+    }
     
     onSetNowPage(menu);
   }

@@ -78,6 +78,10 @@ function subscribe(socket) {
       emit(setNowTime(time));
     });
 
+    socket.on('updateUserData', ({ userList }) => {
+      emit(setGameReadyUserList(userList));
+    })
+
     socket.on('updateScore', ({ userList }) => {
       emit(setGameReadyUserList(userList));
     });
@@ -91,9 +95,15 @@ function subscribe(socket) {
       socket.off('message');
       socket.off('userData');
       socket.off('roomData');
+      socket.off('gameStart');
       socket.off('readyUserData');
       socket.off('allUserReady');
       socket.off('allUserDownload');
+      socket.off('countdown');
+      socket.off('timer');
+      socket.off('updateUserData');
+      socket.off('updateScore');
+      socket.off('roundFinish');
     }
   });
 }
@@ -351,8 +361,7 @@ function* setShowScoreboardSaga() {
       yield put(setNextImage());
       yield put(setShowScoreboard(false));
       // TODO: 타이머 타이밍이 틀어짐
-      // TODO: 점수판에서 변화값 계산해서 보여주기
-      // scoreboardUserList 에 저장하여 계산하기
+      // TODO: 정답을 맞췄으면 체크 표시
     }
   }
 }

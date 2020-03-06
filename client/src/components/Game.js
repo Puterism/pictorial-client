@@ -145,7 +145,7 @@ const Styled = {
     box-sizing: border-box;
     color: white;
     font-size: 5em;
-    cursor: pointer;
+    cursor: ${props => (props.owner ? 'default' : 'pointer')};
   `,
   AnswerArea: styled.div`
     position: absolute;
@@ -325,7 +325,7 @@ const Styled = {
 }
 
 function Game() {
-  const { code, connected, gameReadyUserList, round, timeLimit, images, countdown, timer,
+  const { name, code, connected, gameReadyUserList, round, timeLimit, images, countdown, timer,
     nowRound, nowImage, showImage, showAnswer, showScoreboard, showResult, scoreboardUserList,
     onSetGameReady, onClickedWrong, onClickedAnswer, resultUserList, onReturnToLobby } = useRoom();
   
@@ -336,12 +336,14 @@ function Game() {
 
   const handleClickAnswer = (e) => {
     if (showAnswer || !showImage) return;
+    if (images[nowImage - 1].name === name) return;
     e.stopPropagation();
     onClickedAnswer();
   }
 
   const handleClickWrong = () => {
     if (showAnswer || !showImage) return;
+    if (images[nowImage - 1].name === name) return;
     onClickedWrong();
   }
 
@@ -397,7 +399,9 @@ function Game() {
                   {
                     (nowImage > 0 && images[nowImage - 1].name === user.name) ?
                     <Styled.UserStatus owner />
-                    : 
+                    : (user.isCorrect) ?
+                    <Styled.UserStatus found />
+                    :
                     <Styled.UserStatus finding />
                   }
                 </Styled.UserStat>
@@ -411,6 +415,10 @@ function Game() {
               image={
                 (nowImage && nowImage > 0 && showImage) &&
                 images[nowImage - 1].base64Img
+              }
+              owner={
+                nowImage > 0 && images[nowImage - 1].name === name &&
+                true
               }
             >
               {
