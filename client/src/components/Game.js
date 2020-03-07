@@ -294,7 +294,7 @@ const Styled = {
     width: 371px;
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    margin-top: ${props => props.fourth ? '100px' : '10px'};
   `,
   ResultItemName: styled.span`
     font-weight: bold;
@@ -495,7 +495,7 @@ function Game() {
                   <Styled.ResultTopItemScore third>{user.score}점</Styled.ResultTopItemScore>
                 </Styled.ResultTopItem>
                 : 
-                <Styled.ResultItem key={user.id}>
+                <Styled.ResultItem key={user.id} fourth={index === 3 && true}>
                   <Styled.ResultItemName>
                     {user.name}
                   </Styled.ResultItemName>
@@ -505,16 +505,6 @@ function Game() {
                 </Styled.ResultItem>
               ))
             }
-            {/* <Styled.ResultItemList>
-              <Styled.ResultItem>
-                <Styled.ResultItemName>
-                  wdas
-                </Styled.ResultItemName>
-                <Styled.ResultItemScore>
-                  2334점
-                </Styled.ResultItemScore>
-              </Styled.ResultItem>
-            </Styled.ResultItemList> */}
             <Styled.ResultBackButton onClick={onReturnToLobby}>돌아가기</Styled.ResultBackButton>
           </Styled.Result>
         </Styled.ResultContainer>
