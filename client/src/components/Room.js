@@ -230,7 +230,7 @@ function Room() {
   }
 
   const handleClickStart = () => {
-    if (userList.length >= 1) {
+    if (userList.length > 1) {
       onSetGameStart(true);
     }
   }
