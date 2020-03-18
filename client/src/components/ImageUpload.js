@@ -108,7 +108,9 @@ const Styled = {
     font-weight: 800;
     font-family: inherit;
     margin-top: 45px;
-    cursor: pointer;
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+    -webkit-filter: ${props => props.disabled && 'grayscale(100%)'};
+    filter: ${props => props.disabled && 'gray'};
   `,
   InputFile: styled.input`
     position: absolute;
@@ -181,6 +183,16 @@ const Styled = {
     text-align: center;
     margin-bottom: 10px;
   `, 
+  FlexHorizontalBox: styled.div`
+    display: flex;
+    justify-content: center;
+    flex-direction: left;
+
+    & button {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+  ` 
 }
 
 function ImageUpload() {
@@ -199,6 +211,13 @@ function ImageUpload() {
       reader.readAsDataURL(e.target.files[0]);
       onUploadImage(name, code, e.target.files[0]);
       onSetNowPage('auto');
+    }
+  }
+
+  const handleReset = (e) => {
+    e.preventDefault();
+    if (status === 'uploaded' && answer) {
+      onInitImage();
     }
   }
 
@@ -284,9 +303,14 @@ function ImageUpload() {
             <Styled.UploadBoxMenu onClick={() => handleClickChangePage('manual')} selected={nowPage === 'manual'}>수동출제</Styled.UploadBoxMenu>
           </Styled.UploadBoxMenuContainer>
         </Styled.UploadBoxContainer>
-        <Styled.Button>
-          제출하기
-        </Styled.Button>
+        <Styled.FlexHorizontalBox>
+          <Styled.Button type="button" disabled={status !== 'uploaded' && true} onClick={handleReset}>
+            다시 올리기
+          </Styled.Button>
+          <Styled.Button disabled={status !== 'uploaded' && true}>
+            제출하기
+          </Styled.Button>
+        </Styled.FlexHorizontalBox>
       </Styled.FormContainer>
     </Styled.Container>
   )

@@ -27,8 +27,6 @@ export const IMAGE_READY_SUCCESS = 'room/IMAGE_READY_SUCCESS';
 export const IMAGE_READY_FAILURE = 'room/IMAGE_READY_FAILURE';
 
 export const SET_GAME_READY = 'room/SET_GAME_READY';
-export const SET_GAME_READY_USER_LIST = 'room/SET_GAME_READY_USER_LIST';
-
 export const SET_GAME_START = 'room/SET_GAME_START';
 export const SET_GAME_START_SUCCESS = 'room/SET_GAME_START_SUCCESS';
 
@@ -45,9 +43,13 @@ export const SET_ROUND_STARTED_TIME = 'room/SET_ROUND_STARTED_TIME';
 export const SET_ROUND_STARTED_USER_LIST = 'room/SET_ROUND_STARTED_USER_LIST';
 export const SET_SCOREBOARD_USER_LIST = 'room/SET_SCOREBOARD_USER_LIST';
 
+export const SET_SHOW_HELP = 'room/SET_SHOW_HELP';
 export const SET_NOW_IMAGE = 'room/SET_NOW_IMAGE';
 export const SET_NEXT_IMAGE = 'room/SET_NEXT_IMAGE';
 export const SET_SHOW_IMAGE = 'room/SET_SHOW_IMAGE';
+export const SET_USER_COUNT_WHEN_GAME_STARTED = 'room/SET_USER_COUNT_WHEN_GAME_STARTED';
+
+export const SET_SHOW_ANSWER = 'room/SET_SHOW_ANSWER';
 export const SET_SHOW_SCOREBOARD = 'room/SET_SHOW_SCOREBOARD';
 export const SET_SHOW_RESULT = 'room/SET_SHOW_RESULT';
 
@@ -184,11 +186,6 @@ export const setGameReady = () => ({
   type: SET_GAME_READY,
 });
 
-export const setGameReadyUserList = (list) => ({
-  type: SET_GAME_READY_USER_LIST,
-  payload: list,
-})
-
 export const setGameImageDownloaded = () => ({
   type: SET_GAME_IMAGE_DOWNLOADED,
 });
@@ -230,7 +227,12 @@ export const setRoundStartedUserList = (list) => ({
 export const setScoreboardUserList = (list) => ({
   type: SET_SCOREBOARD_USER_LIST,
   payload: list,
-})
+});
+
+export const setShowHelp = (status) => ({
+  type: SET_SHOW_HELP,
+  payload: status,
+});
 
 export const setNowImage = (imageIndex) => ({
   type: SET_NOW_IMAGE,
@@ -243,6 +245,16 @@ export const setNextImage = () => ({
 
 export const setShowImage = (status) => ({
   type: SET_SHOW_IMAGE,
+  payload: status,
+});
+
+export const setUserCountWhenGameStarted = (count) => ({
+  type: SET_USER_COUNT_WHEN_GAME_STARTED,
+  payload: count,
+})
+
+export const setShowAnswer = (status) => ({
+  type: SET_SHOW_ANSWER,
   payload: status,
 });
 
@@ -273,20 +285,19 @@ export const returnToLobby = () => ({
   type: RETURN_TO_LOBBY,
 });
 
-
-
 const initialState = {
   code: '',
   name: '',
   profile: 1,
   round: 2,
   timeLimit: 3,
+  status: null,
   connected: false,
   userList: [],
   images: [],
   gameReady: false,
-  gameReadyUserList: [],
   scoreboardUserList: [],
+  userCountWhenGameStarted: null,
   inProgress: false,
   nowImage: null,
   nowRound: null,
@@ -297,6 +308,8 @@ const initialState = {
   resultUserList: [],
   roundStartedTime: null,
   roundStartedUserList: [],
+  countdown: null,
+  timer: null,
 }
 
 // reducer
@@ -420,12 +433,6 @@ function room(state = initialState, { type, payload }) {
         gameReady: true,
       }
 
-    case SET_GAME_READY_USER_LIST:
-      return {
-        ...state,
-        gameReadyUserList: payload,
-      }
-
     case SET_SCOREBOARD_USER_LIST:
       return {
         ...state,
@@ -494,7 +501,8 @@ function room(state = initialState, { type, payload }) {
         ...state,
         showImage: false,
         showAnswer: false,
-        countdown: 3,
+        countdown: null,
+        timer: null,
       }
 
     case SET_ROUND_STARTED_TIME:
@@ -509,6 +517,12 @@ function room(state = initialState, { type, payload }) {
         roundStartedUserList: payload,
       }
 
+    case SET_SHOW_HELP:
+      return {
+        ...state,
+        showHelp: payload,
+      }
+
     case SET_NOW_IMAGE:
       return {
         ...state,
@@ -520,13 +534,26 @@ function room(state = initialState, { type, payload }) {
         ...state,
         showImage: false,
         showAnswer: false,
-        countdown: 3,
+        countdown: null,
+        timer: null,
       }
 
     case SET_SHOW_IMAGE:
       return {
         ...state,
         showImage: payload,
+      }
+
+    case SET_USER_COUNT_WHEN_GAME_STARTED:
+      return {
+        ...state,
+        userCountWhenGameStarted: payload,
+      }
+
+    case SET_SHOW_ANSWER:
+      return {
+        ...state,
+        showAnswer: payload,
       }
 
     case SET_SHOW_SCOREBOARD:
@@ -562,13 +589,13 @@ function room(state = initialState, { type, payload }) {
       return {
         ...state,
         gameReady: false,
-        gameReadyUserList: [],
         inProgress: false,
         showResult: false,
         nowImage: null,
         nowRound: null,
         images: [],
         resultUserList: [],
+        userCountWhenGameStarted: null,
       }
 
     default:

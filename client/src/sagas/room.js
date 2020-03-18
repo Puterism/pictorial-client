@@ -5,19 +5,19 @@ import {
   SET_ROUND, SET_TIME_LIMIT, SET_PROFILE, SET_NEXT_ROUND,
   SET_GAME_READY, SET_GAME_START, SET_GAME_START_SUCCESS,
   SET_GAME_IMAGE_DOWNLOADED, SET_GAME_IN_PROGRESS, SET_NOW_COUNTDOWN_TIME,
-  CLICKED_WRONG, CLICKED_ANSWER,
+  CLICKED_WRONG, CLICKED_ANSWER, SET_SHOW_ANSWER, 
   SET_NOW_IMAGE, SET_NEXT_IMAGE, SET_SHOW_SCOREBOARD,
   RETURN_TO_LOBBY, 
   fetchRoomCodeSuccess, fetchRoomCodeFailure,
   connectRoomSuccess, connectRoomFailure,
   checkRoomCodeSuccess, checkRoomCodeFailure,
   imageReady, imageReadySuccess, imageReadyFailure, 
-  setUserList, setRoomData, setGameStartSuccess, setGameReadyUserList,
+  setUserList, setRoomData, setGameStartSuccess, 
   setGameImageDownloaded, setGameInProgress,
   setNowCountdownTime, setNowTime,
-  setNowRound, setNextRound, setNowImage, setNextImage,
-  setShowImage, setShowScoreboard,
-  setResultUserList, setShowResult, setRoundStartedTime, setRoundStartedUserList, setScoreboardUserList, 
+  setShowHelp, setNowRound, setNextRound, setNowImage, setNextImage,
+  setShowAnswer, setShowImage, setShowScoreboard,
+  setResultUserList, setShowResult, setRoundStartedTime, setRoundStartedUserList, setScoreboardUserList, setUserCountWhenGameStarted, 
 } from '../modules/room';
 import { initImage } from '../modules/imageUpload';
 import { push } from 'connected-react-router';
@@ -41,6 +41,7 @@ function subscribe(socket) {
     // 현재 유저 정보 받아옴
     socket.on('userData', ({ userList }) => {
       emit(setUserList(userList));
+      // emit(setGameReadyUserList(userList));
     });
 
     // 방 정보 변경
@@ -55,7 +56,8 @@ function subscribe(socket) {
 
     // 이미지 업로드가 다 되어 준비가 완료된 유저 데이터
     socket.on('readyUserData', ({ userList }) => {
-      emit(setGameReadyUserList(userList));
+      emit(setUserList(userList));
+      // emit(setGameReadyUserList(userList));
     });
 
     // 모든 유저가 이미지 업로드를 마친 상태
@@ -75,19 +77,21 @@ function subscribe(socket) {
 
     // 문제를 맞추어야 하는 제한 시간
     socket.on('timer', ({ time }) => {
-      emit(setNowTime(time));
+      emit(setNowTime(time - 1));
     });
 
     socket.on('updateUserData', ({ userList }) => {
-      emit(setGameReadyUserList(userList));
+      emit(setUserList(userList));
+      // emit(setGameReadyUserList(userList));
     })
 
     socket.on('updateScore', ({ userList }) => {
-      emit(setGameReadyUserList(userList));
+      emit(setUserList(userList));
+      // emit(setGameReadyUserList(userList));
     });
 
     socket.on('roundFinish', () => {
-      emit(setShowScoreboard(true));
+      emit(setShowAnswer(true));
     });
 
 
@@ -195,14 +199,22 @@ function* setGameInProgressSaga() {
   while (true) {
     yield take(SET_GAME_IN_PROGRESS);
 
-    yield put(setNowImage(1));
-    yield put(setNowRound(1)); 
+    const userList = yield select(state => state.room.userList);
+    const gameReadyUserList = yield userList.filter(user => user.isReady);
 
-    // const code = yield select(state => state.room.code);
-    // const timeLimit = yield select(state => state.room.timeLimit);
-    
-    // yield apply(socket, socket.emit, ['roundReady', code]);
-    
+    // 라운드 체크를 위해 이미지 업로드를 완료한 유저 수 체크
+    yield put(setUserCountWhenGameStarted(gameReadyUserList.length));
+
+    // 게임 시작 전 도움말 표시
+    yield put(setShowHelp(true));
+
+    // 3초 대기 후
+    yield delay(3000);
+
+    // 게임 시작 전 도움말 숨기고 시작 설정
+    yield put(setShowHelp(false));
+    yield put(setNowImage(1));
+    yield put(setNowRound(1));
   }
 }
 
@@ -235,11 +247,15 @@ function* setNowCountdownTimeSaga(socket) {
     // const nowCountdownTime = yield select(state => state.room.nowCountdownTime);
 
     const code = yield select(state => state.room.code);
-    const gameReadyUserList = yield select(state => state.room.gameReadyUserList);
+    const timeLimit = yield select(state => state.room.timeLimit);
+    const userList = yield select(state => state.room.userList);
+    const gameReadyUserList = yield userList.filter(user => user.isReady);
 
     if (payload <= 0) {
       // 카운트다운이 0이면 문제 이미지를 보여준다
       yield put(setShowImage(true));
+
+      yield put(setNowTime(timeLimit));
 
       // 점수 변화 계산을 위해 라운드 시작 전 유저 리스트를 저장한다
       yield put(setRoundStartedUserList(gameReadyUserList));
@@ -290,14 +306,13 @@ function* setNextImageSaga() {
     
     const round = yield select(state => state.room.round);
     const nowImage = yield select(state => state.room.nowImage);
-    const gameReadyUserList = yield select(state => state.room.gameReadyUserList);
-    const userCount = gameReadyUserList.length;
+    const userCountWhenGameStarted = yield select(state => state.room.userCountWhenGameStarted);
 
-    if (((nowImage % userCount) + 1) < userCount || (userCount === 1)) { 
-      yield console.log('next round');
+    // TODO: 라운드 수 잘 올라가는지 체크
+    if ((nowImage % userCountWhenGameStarted) <= 0 || (userCountWhenGameStarted === 1)) { 
       yield put(setNextRound());
     }
-    if ((nowImage + 1) <= (userCount * round)) {
+    if ((nowImage + 1) <= (userCountWhenGameStarted * round)) {
       // 문제 내야할 이미지가 남아 있다면 다음 이미지 선택
       yield put(setNowImage(nowImage + 1));
       yield put(setShowScoreboard(false));
@@ -314,10 +329,11 @@ function* setNextRoundSaga() {
     const nowRound = yield select(state => state.room.nowRound);
     const round = yield select(state => state.room.round);
     const nowImage = yield select(state => state.room.nowImage);
-    const gameReadyUserList = yield select(state => state.room.gameReadyUserList);
-    const userCount = gameReadyUserList.length;
+    const userList = yield select(state => state.room.userList);
+    const gameReadyUserList = yield userList.filter(user => user.isReady);
+    const userCountWhenGameStarted = yield select(state => state.room.userCountWhenGameStarted);
 
-    if ((nowImage + 1) > userCount * round) {
+    if ((nowImage + 1) > userCountWhenGameStarted * round) {
       // 게임이 끝나면 유저 리스트를 점수 순으로 정렬하여 배치하고 결과를 띄운다.
       
       let resultUserList = [ ...gameReadyUserList ];
@@ -340,13 +356,25 @@ function* setNextRoundSaga() {
   }
 }
 
+function* setShowAnswerSaga() {
+  while (true) {
+    const { payload } = yield take(SET_SHOW_ANSWER);
+
+    if (payload) {
+      yield delay(2000);
+      yield put(setShowScoreboard(true));
+    }
+  }
+}
+
 function* setShowScoreboardSaga() {
   while (true) {
     const { payload } = yield take(SET_SHOW_SCOREBOARD);
     
     // 점수 차이 계산해서 scoreboardUserList 에 넣기
     const roundStartedUserList = yield select(state => state.room.roundStartedUserList);
-    const gameReadyUserList = yield select(state => state.room.gameReadyUserList);
+    const userList = yield select(state => state.room.userList);
+    const gameReadyUserList = yield userList.filter(user => user.isReady);
     let tempUserList = JSON.parse(JSON.stringify(gameReadyUserList));
 
     for (let i = 0; i < roundStartedUserList.length; i++) {
@@ -356,12 +384,10 @@ function* setShowScoreboardSaga() {
     yield put(setScoreboardUserList(tempUserList));
 
     if (payload) {
-      yield delay(3000);
+      yield delay(2000);
 
       yield put(setNextImage());
       yield put(setShowScoreboard(false));
-      // TODO: 타이머 타이밍이 틀어짐
-      // TODO: 정답을 맞췄으면 체크 표시
     }
   }
 }
@@ -381,6 +407,7 @@ function* handleSocket(socket) {
   yield fork(clickedWrongSaga, socket);
   yield fork(clickedAnswerSaga, socket);
   yield fork(setNowImageSaga, socket);
+  yield fork(setShowAnswerSaga);
   yield fork(setShowScoreboardSaga, socket);
   yield fork(setNextImageSaga);
   yield fork(setNextRoundSaga);

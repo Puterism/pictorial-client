@@ -10,6 +10,7 @@ import ImageOwnerMark from '../svgs/image-owner-mark.svg';
 import ScoreBoard from '../svgs/scoreboard.svg';
 import Result from '../svgs/result.svg';
 import Flakes from '../svgs/flakes.svg';
+import GameStartWithHelp from '../svgs/gamestart-with-help.svg';
 import { ReactComponent as Crown1 } from '../svgs/crown-1.svg';
 import { ReactComponent as Crown2 } from '../svgs/crown-2.svg';
 import { ReactComponent as Crown3 } from '../svgs/crown-3.svg';
@@ -35,6 +36,29 @@ const Styled = {
   GameContainer: styled.div`
     width: 80%;
     margin: 0 auto;
+  `,
+  Help: styled.div`
+    position: fixed;
+    top: 100px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 1380px;
+    height: 582px;
+    background-image: ${`url(${GameStartWithHelp})`};
+    background-position: center;
+    background-size: 100%;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 34px;
+    line-height: 1.3;
+    letter-spacing: 0.34px;
+    color: #303030;
+    text-align: center;
+    cursor: default;
   `,
   Header: styled.div`
     width: 100%;
@@ -79,6 +103,11 @@ const Styled = {
     align-items: center;
     flex-direction: left;
     text-align: left;
+    margin-bottom: 17px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   `,
   UserAlien: styled.div`
     background-image: ${props => `url(${props.alien})`};
@@ -325,8 +354,8 @@ const Styled = {
 }
 
 function Game() {
-  const { name, code, connected, gameReadyUserList, round, timeLimit, images, countdown, timer,
-    nowRound, nowImage, showImage, showAnswer, showScoreboard, showResult, scoreboardUserList,
+  const { name, code, connected, userList, round, timeLimit, images, countdown, timer,
+    nowRound, nowImage, showImage, showAnswer, showScoreboard, showResult, scoreboardUserList, showHelp,
     onSetGameReady, onClickedWrong, onClickedAnswer, resultUserList, onReturnToLobby } = useRoom();
   
 
@@ -352,6 +381,14 @@ function Game() {
       {
         !connected &&
         <Redirect to="/"></Redirect>
+      }
+      {
+        showHelp &&
+        <Styled.Help>
+          주어진 제시어에 맞는 물체를<br />
+          남들보다 빠르게 찾아라!<br />
+          빨리 맞출수록 높은 점수가 주어진다.
+        </Styled.Help>
       }
       <Styled.GameContainer>
         <Styled.Header>
@@ -382,7 +419,7 @@ function Game() {
         <Styled.ContentContainer>
           <Styled.UserList>
             {
-              gameReadyUserList.map((user) => (
+              userList.filter(user => user.isReady).map((user) => (
                 <Styled.UserStat key={user.id}>
                   { user.profile === 1 && <Styled.UserAlien alien={Alien1} /> }
                   { user.profile === 2 && <Styled.UserAlien alien={Alien2} /> }
@@ -437,17 +474,17 @@ function Game() {
             </Styled.ImageBox>
           </Styled.Game>
         </Styled.ContentContainer>
-        <Styled.TimerContainer>
-          <Styled.TimerText>
-            {
-              timer >= 0 &&
-              <>{timer} s</>
-            }
-          </Styled.TimerText>
-          <Styled.TimerBar>
-            <Styled.TimerBarCurrent percentage={(100 / timeLimit) * timer} />
-          </Styled.TimerBar>
-        </Styled.TimerContainer>
+        {
+          (timer > -1 && timer !== null) &&
+          <Styled.TimerContainer>
+            <Styled.TimerText>
+              {timer} s
+            </Styled.TimerText>
+            <Styled.TimerBar>
+              <Styled.TimerBarCurrent percentage={(100 / timeLimit) * timer} />
+            </Styled.TimerBar>
+          </Styled.TimerContainer>
+        }
       </Styled.GameContainer>
       {
         (showScoreboard) &&

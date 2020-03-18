@@ -16,7 +16,6 @@ export default function useRoom() {
   const connected = useSelector((state) => state.room.connected);
   const errorMessage = useSelector((state) => state.room.errorMessage);
   const userList = useSelector((state) => state.room.userList);
-  const gameReadyUserList = useSelector((state) => state.room.gameReadyUserList);
   const scoreboardUserList = useSelector((state) => state.room.scoreboardUserList);
   const images = useSelector((state) => state.room.images);
   const inProgress = useSelector((state) => state.room.inProgress);
@@ -29,6 +28,7 @@ export default function useRoom() {
   const showScoreboard = useSelector((state) => state.room.showScoreboard);
   const showResult = useSelector((state) => state.room.showResult);
   const resultUserList = useSelector((state) => state.room.resultUserList);
+  const showHelp = useSelector((state) => state.room.showHelp);
   
   const dispatch = useDispatch();
 
@@ -120,8 +120,7 @@ export default function useRoom() {
   return {
     name, code, profile, errorMessage, round, timeLimit, connected, userList, 
     images, inProgress, countdown, timer, nowRound, nowImage,
-    gameReadyUserList, scoreboardUserList,
-    showImage, showAnswer, showScoreboard, showResult, resultUserList,
+    scoreboardUserList, showImage, showAnswer, showScoreboard, showResult, resultUserList, showHelp,
     onFetchRoomID, onConnectRoom,
     onSetName, onSetCode, onSetProfile, onSetRound, onSetTimeLimit,
     onCheckRoomCode, onSetUserList, onImageReady,
