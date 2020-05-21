@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/pictorial-client/static/js/main.5dd1871f.chunk.js",
-    "main.js.map": "/pictorial-client/static/js/main.5dd1871f.chunk.js.map",
+    "main.js": "/pictorial-client/static/js/main.afc9414e.chunk.js",
+    "main.js.map": "/pictorial-client/static/js/main.afc9414e.chunk.js.map",
     "runtime-main.js": "/pictorial-client/static/js/runtime-main.3759bb2b.js",
     "runtime-main.js.map": "/pictorial-client/static/js/runtime-main.3759bb2b.js.map",
     "static/js/2.3a6649c3.chunk.js": "/pictorial-client/static/js/2.3a6649c3.chunk.js",
     "static/js/2.3a6649c3.chunk.js.map": "/pictorial-client/static/js/2.3a6649c3.chunk.js.map",
     "index.html": "/pictorial-client/index.html",
-    "precache-manifest.573d79c4a6ba787834d7f8d39ec7e1be.js": "/pictorial-client/precache-manifest.573d79c4a6ba787834d7f8d39ec7e1be.js",
+    "precache-manifest.e906c0ebca300314d2cad6dc4c2403de.js": "/pictorial-client/precache-manifest.e906c0ebca300314d2cad6dc4c2403de.js",
     "service-worker.js": "/pictorial-client/service-worker.js",
     "static/js/2.3a6649c3.chunk.js.LICENSE.txt": "/pictorial-client/static/js/2.3a6649c3.chunk.js.LICENSE.txt",
     "static/media/BG.svg": "/pictorial-client/static/media/BG.bd84a0a6.svg",
@@ -24,27 +24,27 @@
     "static/media/alienL8.svg": "/pictorial-client/static/media/alienL8.cf5a7753.svg",
     "static/media/check.c8b6198b.svg": "/pictorial-client/static/media/check.c8b6198b.svg",
     "static/media/circle.svg": "/pictorial-client/static/media/circle.b244a567.svg",
-    "static/media/crown-1.03ff995f.svg": "/pictorial-client/static/media/crown-1.03ff995f.svg",
-    "static/media/crown-2.d75f89d9.svg": "/pictorial-client/static/media/crown-2.d75f89d9.svg",
-    "static/media/crown-3.f0534f04.svg": "/pictorial-client/static/media/crown-3.f0534f04.svg",
+    "static/media/crown-1.a973a67d.svg": "/pictorial-client/static/media/crown-1.a973a67d.svg",
+    "static/media/crown-2.81032186.svg": "/pictorial-client/static/media/crown-2.81032186.svg",
+    "static/media/crown-3.28ac948a.svg": "/pictorial-client/static/media/crown-3.28ac948a.svg",
     "static/media/finding-mark.svg": "/pictorial-client/static/media/finding-mark.9a35e06e.svg",
-    "static/media/flakes.svg": "/pictorial-client/static/media/flakes.be7d3f75.svg",
+    "static/media/flakes.svg": "/pictorial-client/static/media/flakes.0b153a98.svg",
     "static/media/found-mark.svg": "/pictorial-client/static/media/found-mark.baf4fc0c.svg",
-    "static/media/gamestart-with-help.svg": "/pictorial-client/static/media/gamestart-with-help.c40f2c2d.svg",
+    "static/media/gamestart-with-help.svg": "/pictorial-client/static/media/gamestart-with-help.bcfa5035.svg",
     "static/media/image-owner-mark.svg": "/pictorial-client/static/media/image-owner-mark.6b15269f.svg",
     "static/media/left.a50973b7.svg": "/pictorial-client/static/media/left.a50973b7.svg",
     "static/media/link-share-btn.svg": "/pictorial-client/static/media/link-share-btn.8c1a1fdf.svg",
     "static/media/loading-wheel.4aadf8d7.svg": "/pictorial-client/static/media/loading-wheel.4aadf8d7.svg",
     "static/media/loading.f606dd74.svg": "/pictorial-client/static/media/loading.f606dd74.svg",
     "static/media/plus.160d5e1a.svg": "/pictorial-client/static/media/plus.160d5e1a.svg",
-    "static/media/result.svg": "/pictorial-client/static/media/result.e3cdf772.svg",
+    "static/media/result.svg": "/pictorial-client/static/media/result.76c6feaa.svg",
     "static/media/right.b46ca1d4.svg": "/pictorial-client/static/media/right.b46ca1d4.svg",
-    "static/media/scoreboard.svg": "/pictorial-client/static/media/scoreboard.a5f4a7e3.svg",
+    "static/media/scoreboard.svg": "/pictorial-client/static/media/scoreboard.d0d2e4cb.svg",
     "static/media/small_circle.svg": "/pictorial-client/static/media/small_circle.2629c818.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.3759bb2b.js",
     "static/js/2.3a6649c3.chunk.js",
-    "static/js/main.5dd1871f.chunk.js"
+    "static/js/main.afc9414e.chunk.js"
   ]
 }
